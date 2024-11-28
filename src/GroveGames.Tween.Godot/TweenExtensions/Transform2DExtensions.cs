@@ -8,7 +8,7 @@ namespace GroveGames.Tween.TweenExtensions;
 
 public static class Transform2DExtensions
 {
-    public static TweenBuilder MoveTo(this Transform2D source, float duration, Vector2 target, TweenerContext context, bool autoPlay = true)
+    public static TweenBuilder MoveTo(this Transform2D source, Vector2 target, float duration, TweenerContext context, bool autoPlay = true)
     {
         var builder = context.Create(source.Origin, target, duration, LerpFunctions.Vector2Lerp, autoPlay);
         builder.OnUpdate<Vector2>(position =>
@@ -20,7 +20,7 @@ public static class Transform2DExtensions
         return builder;
     }
 
-    public static TweenBuilder MoveXTo(this Transform2D source, float duration, float target, TweenerContext context, bool autoPlay = true)
+    public static TweenBuilder MoveXTo(this Transform2D source, float target, float duration, TweenerContext context, bool autoPlay = true)
     {
         var builder = context.Create(source.Origin.X, target, duration, LerpFunctions.FloatLerp, autoPlay);
         builder.OnUpdate<float>(positionX =>
@@ -34,7 +34,7 @@ public static class Transform2DExtensions
         return builder;
     }
 
-    public static TweenBuilder MoveYTo(this Transform2D source, float duration, float target, TweenerContext context, bool autoPlay = true)
+    public static TweenBuilder MoveYTo(this Transform2D source, float target, float duration, TweenerContext context, bool autoPlay = true)
     {
         var builder = context.Create(source.Origin.Y, target, duration, LerpFunctions.FloatLerp, autoPlay);
         builder.OnUpdate<float>(positionY =>
@@ -48,19 +48,19 @@ public static class Transform2DExtensions
         return builder;
     }
 
-    public static TweenBuilder RotateTo(this Transform2D source, float duration, float target, TweenerContext context, bool autoPlay = true)
+    public static TweenBuilder RotateTo(this Transform2D source, float target, float duration, TweenerContext context, bool autoPlay = true)
     {
         var builder = context.Create(source.Rotation, target, duration, LerpFunctions.FloatLerp, autoPlay);
         builder.OnUpdate<float>(rotation =>
         {
             var transform = source;
-            transform = transform.Rotated(rotation - transform.Rotation);
+            transform = transform.Rotated(Mathf.DegToRad(rotation) - transform.Rotation);
             source = transform;
         });
         return builder;
     }
 
-    public static TweenBuilder ScaleTo(this Transform2D source, float duration, Vector2 target, TweenerContext context, bool autoPlay = true)
+    public static TweenBuilder ScaleTo(this Transform2D source, Vector2 target, float duration, TweenerContext context, bool autoPlay = true)
     {
         var builder = context.Create(source.Scale, target, duration, LerpFunctions.Vector2Lerp, autoPlay);
         builder.OnUpdate<Vector2>(scale =>
@@ -72,7 +72,7 @@ public static class Transform2DExtensions
         return builder;
     }
 
-    public static TweenBuilder ScaleXTo(this Transform2D source, float duration, float target, TweenerContext context, bool autoPlay = true)
+    public static TweenBuilder ScaleXTo(this Transform2D source, float target, float duration, TweenerContext context, bool autoPlay = true)
     {
         var builder = context.Create(source.Scale.X, target, duration, LerpFunctions.FloatLerp, autoPlay);
         builder.OnUpdate<float>(scaleX =>
@@ -86,7 +86,7 @@ public static class Transform2DExtensions
         return builder;
     }
 
-    public static TweenBuilder ScaleYTo(this Transform2D source, float duration, float target, TweenerContext context, bool autoPlay = true)
+    public static TweenBuilder ScaleYTo(this Transform2D source, float target, float duration, TweenerContext context, bool autoPlay = true)
     {
         var builder = context.Create(source.Scale.Y, target, duration, LerpFunctions.FloatLerp, autoPlay);
         builder.OnUpdate<float>(scaleY =>

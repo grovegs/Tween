@@ -8,7 +8,7 @@ namespace GroveGames.Tween.TweenExtensions;
 
 public static class Sprite3DExtensions
 {
-    public static TweenBuilder FadeTo(this Sprite3D source, float duration, float target, TweenerContext context, bool autoPlay = true)
+    public static TweenBuilder FadeTo(this Sprite3D source, float target, float duration, TweenerContext context, bool autoPlay = true)
     {
         var alpha = source.Modulate.A;
         var builder = context.Create(alpha, target, duration, LerpFunctions.FloatLerp, autoPlay);

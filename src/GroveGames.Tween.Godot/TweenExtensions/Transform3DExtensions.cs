@@ -8,14 +8,14 @@ namespace GroveGames.Tween.TweenExtensions;
 
 public static class Transform3DExtensions
 {
-    public static TweenBuilder MoveTo(this Transform3D source, float duration, Vector3 target, TweenerContext context, bool autoPlay = true)
+    public static TweenBuilder MoveTo(this Transform3D source, Vector3 target, float duration, TweenerContext context, bool autoPlay = true)
     {
         var builder = context.Create(source.Origin, target, duration, LerpFunctions.Vector3Lerp, autoPlay);
         builder.OnUpdate<Vector3>(origin => source.Origin = origin);
         return builder;
     }
 
-    public static TweenBuilder MoveXTo(this Transform3D source, float duration, float target, TweenerContext context, bool autoPlay = true)
+    public static TweenBuilder MoveXTo(this Transform3D source, float target, float duration, TweenerContext context, bool autoPlay = true)
     {
         var builder = context.Create(source.Origin.X, target, duration, LerpFunctions.FloatLerp, autoPlay);
         builder.OnUpdate<float>(positionX =>
@@ -27,7 +27,7 @@ public static class Transform3DExtensions
         return builder;
     }
 
-    public static TweenBuilder MoveYTo(this Transform3D source, float duration, float target, TweenerContext context, bool autoPlay = true)
+    public static TweenBuilder MoveYTo(this Transform3D source, float target, float duration, TweenerContext context, bool autoPlay = true)
     {
         var builder = context.Create(source.Origin.Y, target, duration, LerpFunctions.FloatLerp, autoPlay);
         builder.OnUpdate<float>(positionY =>
@@ -39,7 +39,7 @@ public static class Transform3DExtensions
         return builder;
     }
 
-    public static TweenBuilder MoveZTo(this Transform3D source, float duration, float target, TweenerContext context, bool autoPlay = true)
+    public static TweenBuilder MoveZTo(this Transform3D source, float target, float duration, TweenerContext context, bool autoPlay = true)
     {
         var builder = context.Create(source.Origin.Z, target, duration, LerpFunctions.FloatLerp, autoPlay);
         builder.OnUpdate<float>(positionZ =>
@@ -51,70 +51,70 @@ public static class Transform3DExtensions
         return builder;
     }
 
-    public static TweenBuilder ScaleTo(this Transform3D source, float duration, Vector3 target, TweenerContext context, bool autoPlay = true)
+    public static TweenBuilder ScaleTo(this Transform3D source, Vector3 target, float duration, TweenerContext context, bool autoPlay = true)
     {
         var builder = context.Create(source.Basis.Scale, target, duration, LerpFunctions.Vector3Lerp, autoPlay);
         builder.OnUpdate<Vector3>(scale =>
         {
-            var basis = source.Basis.Scaled(scale / source.Basis.Scale); // Adjust scaling
+            var basis = source.Basis.Scaled(scale / source.Basis.Scale);
             source.Basis = basis;
         });
         return builder;
     }
 
-    public static TweenBuilder ScaleXTo(this Transform3D source, float duration, float target, TweenerContext context, bool autoPlay = true)
+    public static TweenBuilder ScaleXTo(this Transform3D source, float target, float duration, TweenerContext context, bool autoPlay = true)
     {
         var builder = context.Create(source.Basis.Scale.X, target, duration, LerpFunctions.FloatLerp, autoPlay);
         builder.OnUpdate<float>(scaleX =>
         {
             var currentScale = source.Basis.Scale;
-            var scale = new Vector3(scaleX / currentScale.X, 1, 1); // Adjust X-axis scale only
+            var scale = new Vector3(scaleX / currentScale.X, 1, 1);
             var basis = source.Basis.Scaled(scale);
             source.Basis = basis;
         });
         return builder;
     }
 
-    public static TweenBuilder ScaleYTo(this Transform3D source, float duration, float target, TweenerContext context, bool autoPlay = true)
+    public static TweenBuilder ScaleYTo(this Transform3D source, float target, float duration, TweenerContext context, bool autoPlay = true)
     {
         var builder = context.Create(source.Basis.Scale.Y, target, duration, LerpFunctions.FloatLerp, autoPlay);
         builder.OnUpdate<float>(scaleY =>
         {
             var currentScale = source.Basis.Scale;
-            var scale = new Vector3(1, scaleY / currentScale.Y, 1); // Adjust Y-axis scale only
+            var scale = new Vector3(1, scaleY / currentScale.Y, 1);
             var basis = source.Basis.Scaled(scale);
             source.Basis = basis;
         });
         return builder;
     }
 
-    public static TweenBuilder ScaleZTo(this Transform3D source, float duration, float target, TweenerContext context, bool autoPlay = true)
+    public static TweenBuilder ScaleZTo(this Transform3D source, float target, float duration, TweenerContext context, bool autoPlay = true)
     {
         var builder = context.Create(source.Basis.Scale.Z, target, duration, LerpFunctions.FloatLerp, autoPlay);
         builder.OnUpdate<float>(scaleZ =>
         {
             var currentScale = source.Basis.Scale;
-            var scale = new Vector3(1, 1, scaleZ / currentScale.Z); // Adjust Z-axis scale only
+            var scale = new Vector3(1, 1, scaleZ / currentScale.Z);
             var basis = source.Basis.Scaled(scale);
             source.Basis = basis;
         });
         return builder;
     }
 
-    public static TweenBuilder RotateTo(this Transform3D source, float duration, Vector3 targetEuler, TweenerContext context, bool autoPlay = true)
+    public static TweenBuilder RotateTo(this Transform3D source, Vector3 targetEuler, float duration, TweenerContext context, bool autoPlay = true)
     {
         var startEuler = source.Basis.GetEuler();
         var builder = context.Create(startEuler, targetEuler, duration, LerpFunctions.Vector3Lerp, autoPlay);
         builder.OnUpdate<Vector3>(eulerAngles =>
         {
-            var basis = Basis.FromEuler(eulerAngles); // Create Basis from Euler angles
-            basis = basis.Scaled(source.Basis.Scale); // Preserve scale
+            var basis = Basis.FromEuler(eulerAngles);
+            basis = basis.Scaled(source.Basis.Scale);
             source.Basis = basis;
         });
         return builder;
     }
 
-    public static TweenBuilder RotateXTo(this Transform3D source, float duration, float target, TweenerContext context, bool autoPlay = true)
+    public static TweenBuilder RotateXTo(this Transform3D source, float target, float duration, TweenerContext context, bool autoPlay = true)
     {
         var startEuler = source.Basis.GetEuler();
         var builder = context.Create(startEuler.X, target, duration, LerpFunctions.FloatLerp, autoPlay);
@@ -123,13 +123,13 @@ public static class Transform3DExtensions
             var euler = source.Basis.GetEuler();
             euler.X = rotationX;
             var basis = Basis.FromEuler(euler);
-            basis = basis.Scaled(source.Basis.Scale); // Preserve scale
+            basis = basis.Scaled(source.Basis.Scale);
             source.Basis = basis;
         });
         return builder;
     }
 
-    public static TweenBuilder RotateYTo(this Transform3D source, float duration, float target, TweenerContext context, bool autoPlay = true)
+    public static TweenBuilder RotateYTo(this Transform3D source, float target, float duration, TweenerContext context, bool autoPlay = true)
     {
         var startEuler = source.Basis.GetEuler();
         var builder = context.Create(startEuler.Y, target, duration, LerpFunctions.FloatLerp, autoPlay);
@@ -138,13 +138,13 @@ public static class Transform3DExtensions
             var euler = source.Basis.GetEuler();
             euler.Y = rotationY;
             var basis = Basis.FromEuler(euler);
-            basis = basis.Scaled(source.Basis.Scale); // Preserve scale
+            basis = basis.Scaled(source.Basis.Scale);
             source.Basis = basis;
         });
         return builder;
     }
 
-    public static TweenBuilder RotateZTo(this Transform3D source, float duration, float target, TweenerContext context, bool autoPlay = true)
+    public static TweenBuilder RotateZTo(this Transform3D source, float target, float duration, TweenerContext context, bool autoPlay = true)
     {
         var startEuler = source.Basis.GetEuler();
         var builder = context.Create(startEuler.Z, target, duration, LerpFunctions.FloatLerp, autoPlay);
@@ -153,7 +153,7 @@ public static class Transform3DExtensions
             var euler = source.Basis.GetEuler();
             euler.Z = rotationZ;
             var basis = Basis.FromEuler(euler);
-            basis = basis.Scaled(source.Basis.Scale); // Preserve scale
+            basis = basis.Scaled(source.Basis.Scale);
             source.Basis = basis;
         });
         return builder;
