@@ -1,0 +1,16 @@
+[gd_scene load_steps=3 format=3 uid="uid://dyi6m4rl68ekm"]
+
+[ext_resource type="Script" path="res://TestSceneController.cs" id="1_fqkkp"]
+
+[sub_resource type="BoxMesh" id="BoxMesh_fq7r8"]
+
+[node name="TestScene" type="Node3D" node_paths=PackedStringArray("_cube")]
+script = ExtResource("1_fqkkp")
+_cube = NodePath("MeshInstance3D")
+
+[node name="Camera3D" type="Camera3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 1.55228)
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -0.989898)
+mesh = SubResource("BoxMesh_fq7r8")
