@@ -94,49 +94,49 @@ public static class Node3DExtensions
         return builder;
     }
 
-    public static TweenBuilder RotateTo(this Node3D source, Vector3 targetDegrees, float duration, TweenerContext context, bool autoPlay = true)
+    public static TweenBuilder RotateTo(this Node3D source, Vector3 target, float duration, TweenerContext context, bool autoPlay = true)
     {
-        var startDegrees = source.RotationDegrees;
-        var builder = context.Create(startDegrees, targetDegrees, duration, LerpFunctions.Vector3Lerp, autoPlay);
-        builder.OnUpdate<Vector3>(eulerAngles => source.RotationDegrees = eulerAngles);
+        var startDegrees = source.Rotation;
+        var builder = context.Create(startDegrees, target, duration, LerpFunctions.Vector3Lerp, autoPlay);
+        builder.OnUpdate<Vector3>(degrees => source.Rotation = degrees);
         return builder;
     }
 
     public static TweenBuilder RotateXTo(this Node3D source, float target, float duration, TweenerContext context, bool autoPlay = true)
     {
-        var startDegrees = source.RotationDegrees;
+        var startDegrees = source.Rotation;
         var builder = context.Create(startDegrees.X, target, duration, LerpFunctions.FloatLerp, autoPlay);
         builder.OnUpdate<float>(rotationX =>
         {
-            var euler = source.RotationDegrees;
-            euler.X = rotationX;
-            source.RotationDegrees = euler;
+            var rotation = source.Rotation;
+            rotation.X = Mathf.DegToRad(rotationX);
+            source.Rotation = rotation;
         });
         return builder;
     }
 
     public static TweenBuilder RotateYTo(this Node3D source, float target, float duration, TweenerContext context, bool autoPlay = true)
     {
-        var startDegrees = source.RotationDegrees;
+        var startDegrees = source.Rotation;
         var builder = context.Create(startDegrees.Y, target, duration, LerpFunctions.FloatLerp, autoPlay);
         builder.OnUpdate<float>(rotationY =>
         {
-            var euler = source.RotationDegrees;
-            euler.Y = rotationY;
-            source.RotationDegrees = euler;
+            var rotation = source.Rotation;
+            rotation.Y = Mathf.DegToRad(rotationY);
+            source.Rotation = rotation;
         });
         return builder;
     }
 
     public static TweenBuilder RotateZTo(this Node3D source, float target, float duration, TweenerContext context, bool autoPlay = true)
     {
-        var startDegrees = source.RotationDegrees;
+        var startDegrees = source.Rotation;
         var builder = context.Create(startDegrees.Z, target, duration, LerpFunctions.FloatLerp, autoPlay);
         builder.OnUpdate<float>(rotationZ =>
         {
-            var euler = source.RotationDegrees;
-            euler.Z = rotationZ;
-            source.RotationDegrees = euler;
+            var euler = source.Rotation;
+            euler.Z = Mathf.DegToRad(rotationZ);
+            source.Rotation = euler;
         });
         return builder;
     }
