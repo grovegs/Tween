@@ -1,0 +1,49 @@
+﻿Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.0.31903.59
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{02380D4B-C06F-4992-B341-174BF397419C}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{5EDD4F0D-BBBF-42F2-8527-4E354C0AF3EB}"
+EndProject
+Project("{A59B47AD-9D14-4246-B70B-694C52C472E7}") = "GroveGames.Tween", "src\GroveGames.Tween\GroveGames.Tween.csproj", "{D4C9B218-B585-476B-97FE-BBE4FE540B99}"
+EndProject
+Project("{A59B47AD-9D14-4246-B70B-694C52C472E7}") = "GroveGames.Tween.Godot", "src\GroveGames.Tween.Godot\GroveGames.Tween.Godot.csproj", "{43A48F1A-BF3B-48C3-9622-C286DD7D5121}"
+EndProject
+Project("{A59B47AD-9D14-4246-B70B-694C52C472E7}") = "GroveGames.Tween.Tests", "tests\GroveGames.Tween.Tests\GroveGames.Tween.Tests.csproj", "{2485A4C8-8DB8-4BDF-A0FB-1A51839EF780}"
+EndProject
+Project("{A59B47AD-9D14-4246-B70B-694C52C472E7}") = "GroveGames.Tween.Godot.Tests", "tests\GroveGames.Tween.Godot.Tests\GroveGames.Tween.Godot.Tests.csproj", "{62D6D594-9FFF-4547-8AEA-4BC2999600A4}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{D4C9B218-B585-476B-97FE-BBE4FE540B99}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D4C9B218-B585-476B-97FE-BBE4FE540B99}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D4C9B218-B585-476B-97FE-BBE4FE540B99}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D4C9B218-B585-476B-97FE-BBE4FE540B99}.Release|Any CPU.Build.0 = Release|Any CPU
+		{43A48F1A-BF3B-48C3-9622-C286DD7D5121}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{43A48F1A-BF3B-48C3-9622-C286DD7D5121}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{43A48F1A-BF3B-48C3-9622-C286DD7D5121}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{43A48F1A-BF3B-48C3-9622-C286DD7D5121}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2485A4C8-8DB8-4BDF-A0FB-1A51839EF780}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2485A4C8-8DB8-4BDF-A0FB-1A51839EF780}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2485A4C8-8DB8-4BDF-A0FB-1A51839EF780}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2485A4C8-8DB8-4BDF-A0FB-1A51839EF780}.Release|Any CPU.Build.0 = Release|Any CPU
+		{62D6D594-9FFF-4547-8AEA-4BC2999600A4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{62D6D594-9FFF-4547-8AEA-4BC2999600A4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{62D6D594-9FFF-4547-8AEA-4BC2999600A4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{62D6D594-9FFF-4547-8AEA-4BC2999600A4}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{D4C9B218-B585-476B-97FE-BBE4FE540B99} = {02380D4B-C06F-4992-B341-174BF397419C}
+		{43A48F1A-BF3B-48C3-9622-C286DD7D5121} = {02380D4B-C06F-4992-B341-174BF397419C}
+		{2485A4C8-8DB8-4BDF-A0FB-1A51839EF780} = {5EDD4F0D-BBBF-42F2-8527-4E354C0AF3EB}
+		{62D6D594-9FFF-4547-8AEA-4BC2999600A4} = {5EDD4F0D-BBBF-42F2-8527-4E354C0AF3EB}
+	EndGlobalSection
+EndGlobal
