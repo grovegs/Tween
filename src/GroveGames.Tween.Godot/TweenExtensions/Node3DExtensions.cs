@@ -141,7 +141,7 @@ public static class Node3DExtensions
         return builder;
     }
 
-    public static TweenBuilder ScaleTo(this Node3D source, float duration, Vector3 target, TweenerContext context, bool autoPlay = true)
+    public static TweenBuilder ScaleTo(this Node3D source, Vector3 target, float duration, TweenerContext context, bool autoPlay = true)
     {
         var builder = context.Create(source.Scale, target, duration, LerpFunctions.Vector3Lerp, autoPlay);
         builder.OnUpdate<Vector3>(scale => source.Scale = scale);
