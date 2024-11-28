@@ -21,7 +21,7 @@ public partial class TestSceneController : Node3D
 			GD.Print(position);
 		});
 
-		_cube.RotateYTo(5f, 360, _context);
+		_cube.RotateYTo(360, 5f, _context);
     }
 
 	// Called every frame. 'delta' is the elapsed time since the previous frame.
