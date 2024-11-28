@@ -9,7 +9,7 @@ script = ExtResource("1_fqkkp")
 _cube = NodePath("MeshInstance3D")
 
 [node name="Camera3D" type="Camera3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 1.55228)
+transform = Transform3D(1, 0, 0, 0, 0.902096, 0.431535, 0, -0.431535, 0.902096, 0, 1.49632, 1.55228)
 
 [node name="MeshInstance3D" type="MeshInstance3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -0.989898)

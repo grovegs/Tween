@@ -14,14 +14,16 @@ public partial class TestSceneController : Node3D
     public override void _Ready()
     {
         _context = new TweenerContext();
+		
 		_cube.MoveXTo(_cube.GlobalPosition.X + 2f, 5f, _context)
 		.Ease(EaseType.EaseInBack)
 		.OnComplete(() => GD.Print("Completed"))
-		.OnUpdate<float>(position => {
-			GD.Print(position);
+		.OnUpdate<float>(positionX => {
+			GD.Print(positionX);
 		});
-
-		_cube.RotateYTo(5f, 360, _context);
+		
+		_cube.RotateYTo(90f, 5f, _context);
+		_cube.ScaleTo(Vector3.One * 0.5f, 5f, _context);
     }
 
 	// Called every frame. 'delta' is the elapsed time since the previous frame.
