@@ -2,7 +2,7 @@ using GroveGames.Tween.Easing;
 
 namespace GroveGames.Tween.Core;
 
-internal interface ITween
+public interface ITween
 {
     void SetEase(EaseType easeType);
     void SetOnComplete(Action onComplete);
@@ -12,9 +12,10 @@ internal interface ITween
     void Play();
     bool IsRunning { get; }
     bool IsPlaying { get; }
+    float Duration { get; }
 }
 
-internal interface ITween<T> : ITween
+public interface ITween<T> : ITween
 {
     void SetOnUpdate(Action<T> onUpdate);
 }

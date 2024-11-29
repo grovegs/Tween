@@ -15,14 +15,13 @@ public class TweenerContext
         _killedTweens = [];
     }
 
-    public TweenBuilder Create<T>(T start, T end, float duration, Func<T, T, float, T> lerpFunc, bool autoPlay)
+    public ITween Create<T>(T start, T end, float duration, Func<T, T, float, T> lerpFunc, bool autoPlay)
     {
         ITween tween = new Tween<T>(start, end, duration, lerpFunc: lerpFunc, autoPlay);
-        var builder = new TweenBuilder(in tween);
-        builder.OnComplete(() => _killedTweens.Add(tween));
+        tween.SetOnComplete(() => _killedTweens.Add(tween));
         _tweens.Add(tween);
 
-        return builder;
+        return tween;
     }
 
     public void Update(float deltaTime)

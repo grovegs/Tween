@@ -7,6 +7,8 @@ internal struct Tween<T> : ITween<T>
     public readonly bool IsRunning => _isRunning;
     public readonly bool IsPlaying => _isPlaying;
 
+    public readonly float Duration => _duration;
+
     private readonly float _duration;
     private float _elapsedTime;
 
