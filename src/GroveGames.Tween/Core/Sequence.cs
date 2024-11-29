@@ -61,7 +61,7 @@ internal class Sequence : ISequence
         tween.Pause();
         if (_sequenceTweenElements.Count > 0)
         {
-            _currentInterval += tween.Duration;
+            _currentInterval += _sequenceTweenElements[^1].Tween.Duration;
         }
         var element = new SequenceTweenElement(_currentInterval, in tween);
         _sequenceTweenElements.Add(element);
