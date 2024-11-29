@@ -58,15 +58,19 @@ internal class Sequence : ISequence
 
     public ISequence Append(in ITween tween)
     {
+        tween.Pause();
+        if (_sequenceTweenElements.Count > 0)
+        {
+            _currentInterval += tween.Duration;
+        }
         var element = new SequenceTweenElement(_currentInterval, in tween);
         _sequenceTweenElements.Add(element);
-
-        _currentInterval += tween.Duration;
         return this;
     }
 
     public ISequence Join(in ITween tween)
     {
+        tween.Pause();
         var element = new SequenceTweenElement(_currentInterval, in tween);
         _sequenceTweenElements.Add(element);
         return this;
@@ -87,6 +91,7 @@ internal class Sequence : ISequence
 
     public ISequence Insert(float t, in ITween tween)
     {
+        tween.Pause();
         var element = new SequenceTweenElement(t, in tween);
         _sequenceTweenElements.Add(element);
         return this;
@@ -134,16 +139,16 @@ internal class Sequence : ISequence
         }
 
         _elapsedTime += deltaTime;
-        var progress = _elapsedTime / Duration;
-        var easedTime = deltaTime * EaseCalculations.Evaluate(_easeType, progress);
-        _elapsedTime = easedTime * Duration;
+       // var progress = _elapsedTime / Duration;
+       // var easedTime = deltaTime * EaseCalculations.Evaluate(_easeType, progress);
+       // _elapsedTime = easedTime * Duration;
 
         for (var i = 0; i < _sequenceTweenElements.Count; i++)
         {
             var currentElement = _sequenceTweenElements[i];
             if (_elapsedTime >= currentElement.ExecutionTime && currentElement.Tween.IsRunning)
             {
-                currentElement.Tween.Update(deltaTime);
+                currentElement.Tween.Play();
             }
 
             else if (_elapsedTime >= currentElement.ExecutionTime && !currentElement.Tween.IsRunning)
