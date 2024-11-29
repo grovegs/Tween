@@ -103,14 +103,16 @@ internal class Sequence : ISequence
         _isPlaying = true;
     }
 
-    public void SetEase(EaseType easeType)
+    public ITween SetEase(EaseType easeType)
     {
         _easeType = easeType;
+        return this;
     }
 
-    public void SetOnComplete(Action onComplete)
+    public ITween SetOnComplete(Action onComplete)
     {
         _onComplete += onComplete;
+        return this;
     }
 
     public void Stop(bool complete)
