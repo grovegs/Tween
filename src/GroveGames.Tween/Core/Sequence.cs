@@ -56,41 +56,47 @@ internal class Sequence : ISequence
         _easeType = EaseType.Linear;
     }
 
-    public void Append(in ITween tween)
+    public ISequence Append(in ITween tween)
     {
         var element = new SequenceTweenElement(_currentInterval, in tween);
         _sequenceTweenElements.Add(element);
 
         _currentInterval += tween.Duration;
+        return this;
     }
 
-    public void Join(in ITween tween)
+    public ISequence Join(in ITween tween)
     {
         var element = new SequenceTweenElement(_currentInterval, in tween);
         _sequenceTweenElements.Add(element);
+        return this;
     }
 
-    public void AppendCallback(Action callback)
+    public ISequence AppendCallback(Action callback)
     {
         var element = new SequenceCallbackElement(_currentInterval, callback);
         _sequenceCallbackElements.Add(element);
+        return this;
     }
 
-    public void AppendInterval(float interval)
+    public ISequence AppendInterval(float interval)
     {
         _currentInterval += interval;
+        return this;
     }
 
-    public void Insert(float t, in ITween tween)
+    public ISequence Insert(float t, in ITween tween)
     {
         var element = new SequenceTweenElement(t, in tween);
         _sequenceTweenElements.Add(element);
+        return this;
     }
 
-    public void InsertCallback(float t, Action callback)
+    public ISequence InsertCallback(float t, Action callback)
     {
         var element = new SequenceCallbackElement(t, callback);
         _sequenceCallbackElements.Add(element);
+        return this;
     }
 
     public void Pause()
