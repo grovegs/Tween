@@ -4,6 +4,13 @@ namespace GroveGames.Tween.Easing;
 
 public static class EaseCalculations
 {
+    private const float PI = MathF.PI;
+    private const float C1 = 1.70158f;
+    private const float C2 = C1 * 1.525f;
+    private const float C3 = C1 + 1;
+    private const float C4 = 2 * PI / 3;
+    private const float C5 = 2 * PI / 4.5f;
+
     public static float Evaluate(EaseType easeType, float t)
     {
         return easeType switch
@@ -43,73 +50,97 @@ public static class EaseCalculations
         };
     }
 
-    // Linear
-    private static float Linear(float t) => t;
+    public static float Linear(float x) => x;
 
-    // Quad
-    private static float EaseInQuad(float t) => t * t;
-    private static float EaseOutQuad(float t) => t * (2 - t);
-    private static float EaseInOutQuad(float t) => t < 0.5f ? 2 * t * t : -1 + (4 - 2 * t) * t;
+    public static float EaseInQuad(float x) => x * x;
 
-    // Cubic
-    private static float EaseInCubic(float t) => t * t * t;
-    private static float EaseOutCubic(float t) => (--t) * t * t + 1;
-    private static float EaseInOutCubic(float t) => t < 0.5f ? 4 * t * t * t : (t - 1) * (2 * t - 2) * (2 * t - 2) + 1;
+    public static float EaseOutQuad(float x) => 1 - (1 - x) * (1 - x);
 
-    // Quart
-    private static float EaseInQuart(float t) => t * t * t * t;
-    private static float EaseOutQuart(float t) => 1 - (--t) * t * t * t;
-    private static float EaseInOutQuart(float t) => t < 0.5f ? 8 * t * t * t * t : 1 - 8 * (--t) * t * t * t;
+    public static float EaseInOutQuad(float x) =>
+        x < 0.5f ? 2 * x * x : 1 - MathF.Pow(-2 * x + 2, 2) / 2;
 
-    // Quint
-    private static float EaseInQuint(float t) => t * t * t * t * t;
-    private static float EaseOutQuint(float t) => 1 + (--t) * t * t * t * t;
-    private static float EaseInOutQuint(float t) => t < 0.5f ? 16 * t * t * t * t * t : 1 + 16 * (--t) * t * t * t * t;
+    public static float EaseInCubic(float x) => x * x * x;
 
-    // Sine
-    private static float EaseInSine(float t) => 1 - (float)Math.Cos(t * Math.PI / 2);
-    private static float EaseOutSine(float t) => (float)Math.Sin(t * Math.PI / 2);
-    private static float EaseInOutSine(float t) => 0.5f * (1 - (float)Math.Cos(Math.PI * t));
+    public static float EaseOutCubic(float x) => 1 - MathF.Pow(1 - x, 3);
 
-    // Expo
-    private static float EaseInExpo(float t) => t == 0 ? 0 : (float)Math.Pow(2, 10 * (t - 1));
-    private static float EaseOutExpo(float t) => t == 1 ? 1 : 1 - (float)Math.Pow(2, -10 * t);
-    private static float EaseInOutExpo(float t) =>
-        t == 0 ? 0 : t == 1 ? 1 : t < 0.5f ? (float)Math.Pow(2, 20 * t - 10) / 2 : (2 - (float)Math.Pow(2, -20 * t + 10)) / 2;
+    public static float EaseInOutCubic(float x) =>
+        x < 0.5f ? 4 * x * x * x : 1 - MathF.Pow(-2 * x + 2, 3) / 2;
 
-    // Circ
-    private static float EaseInCirc(float t) => 1 - (float)Math.Sqrt(1 - t * t);
-    private static float EaseOutCirc(float t) => (float)Math.Sqrt(1 - (--t) * t);
-    private static float EaseInOutCirc(float t) =>
-        t < 0.5f ? (1 - (float)Math.Sqrt(1 - 4 * t * t)) / 2 : ((float)Math.Sqrt(1 - (--t) * (2 * t - 2)) + 1) / 2;
+    public static float EaseInQuart(float x) => x * x * x * x;
 
-    // Elastic
-    private static float EaseInElastic(float t) =>
-        t == 0 || t == 1 ? t : -(float)Math.Pow(2, 10 * (t - 1)) * (float)Math.Sin((t - 1.1f) * 5 * Math.PI);
-    private static float EaseOutElastic(float t) =>
-        t == 0 || t == 1 ? t : (float)Math.Pow(2, -10 * t) * (float)Math.Sin((t - 0.1f) * 5 * Math.PI) + 1;
-    private static float EaseInOutElastic(float t) =>
-        t == 0 || t == 1
-            ? t
-            : t < 0.5f
-                ? -(float)Math.Pow(2, 20 * t - 10) * (float)Math.Sin((20 * t - 11.125f) * Math.PI / 4.5f) / 2
-                : (float)Math.Pow(2, -20 * t + 10) * (float)Math.Sin((20 * t - 11.125f) * Math.PI / 4.5f) / 2 + 1;
+    public static float EaseOutQuart(float x) => 1 - MathF.Pow(1 - x, 4);
 
-    // Back
-    private static float EaseInBack(float t, float s = 1.70158f) => t * t * ((s + 1) * t - s);
-    private static float EaseOutBack(float t, float s = 1.70158f) => (--t) * t * ((s + 1) * t + s) + 1;
-    private static float EaseInOutBack(float t, float s = 1.70158f) =>
-        t < 0.5f ? t * t * ((s + 1) * 2 * t - s) / 2 : ((--t) * t * ((s + 1) * 2 * t + s) + 2) / 2;
+    public static float EaseInOutQuart(float x) =>
+        x < 0.5f ? 8 * x * x * x * x : 1 - MathF.Pow(-2 * x + 2, 4) / 2;
 
-    // Bounce
-    private static float EaseInBounce(float t) => 1 - EaseOutBounce(1 - t);
-    private static float EaseOutBounce(float t)
+    public static float EaseInQuint(float x) => x * x * x * x * x;
+
+    public static float EaseOutQuint(float x) => 1 - MathF.Pow(1 - x, 5);
+
+    public static float EaseInOutQuint(float x) =>
+        x < 0.5f ? 16 * x * x * x * x * x : 1 - MathF.Pow(-2 * x + 2, 5) / 2;
+
+    public static float EaseInSine(float x) => 1 - MathF.Cos(x * PI / 2);
+
+    public static float EaseOutSine(float x) => MathF.Sin(x * PI / 2);
+
+    public static float EaseInOutSine(float x) => -(MathF.Cos(PI * x) - 1) / 2;
+
+    public static float EaseInExpo(float x) => x == 0 ? 0 : MathF.Pow(2, 10 * x - 10);
+
+    public static float EaseOutExpo(float x) => x == 1 ? 1 : 1 - MathF.Pow(2, -10 * x);
+
+    public static float EaseInOutExpo(float x) =>
+        x == 0 ? 0 :
+        x == 1 ? 1 :
+        x < 0.5f ? MathF.Pow(2, 20 * x - 10) / 2 : (2 - MathF.Pow(2, -20 * x + 10)) / 2;
+
+    public static float EaseInCirc(float x) => 1 - MathF.Sqrt(1 - x * x);
+
+    public static float EaseOutCirc(float x) => MathF.Sqrt(1 - MathF.Pow(x - 1, 2));
+
+    public static float EaseInOutCirc(float x) =>
+        x < 0.5f ? (1 - MathF.Sqrt(1 - MathF.Pow(2 * x, 2))) / 2 :
+                  (MathF.Sqrt(1 - MathF.Pow(-2 * x + 2, 2)) + 1) / 2;
+
+    public static float EaseInBack(float x) => C3 * x * x * x - C1 * x * x;
+
+    public static float EaseOutBack(float x) => 1 + C3 * MathF.Pow(x - 1, 3) + C1 * MathF.Pow(x - 1, 2);
+
+    public static float EaseInOutBack(float x) =>
+        x < 0.5f ? MathF.Pow(2 * x, 2) * ((C2 + 1) * 2 * x - C2) / 2 :
+                  (MathF.Pow(2 * x - 2, 2) * ((C2 + 1) * (2 * x - 2) + C2) + 2) / 2;
+
+    public static float EaseInElastic(float x) =>
+        x == 0 ? 0 :
+        x == 1 ? 1 :
+        -MathF.Pow(2, 10 * x - 10) * MathF.Sin((x * 10 - 10.75f) * C4);
+
+    public static float EaseOutElastic(float x) =>
+        x == 0 ? 0 :
+        x == 1 ? 1 :
+        MathF.Pow(2, -10 * x) * MathF.Sin((x * 10 - 0.75f) * C4) + 1;
+
+    public static float EaseInOutElastic(float x) =>
+        x == 0 ? 0 :
+        x == 1 ? 1 :
+        x < 0.5f ? -(MathF.Pow(2, 20 * x - 10) * MathF.Sin((20 * x - 11.125f) * C5)) / 2 :
+                  MathF.Pow(2, -20 * x + 10) * MathF.Sin((20 * x - 11.125f) * C5) / 2 + 1;
+
+    public static float EaseInBounce(float x) => 1 - EaseOutBounce(1 - x);
+
+    public static float EaseOutBounce(float x)
     {
-        if (t < 1 / 2.75f) return 7.5625f * t * t;
-        if (t < 2 / 2.75f) return 7.5625f * (t -= 1.5f / 2.75f) * t + 0.75f;
-        if (t < 2.5f / 2.75f) return 7.5625f * (t -= 2.25f / 2.75f) * t + 0.9375f;
-        return 7.5625f * (t -= 2.625f / 2.75f) * t + 0.984375f;
+        const float N1 = 7.5625f;
+        const float D1 = 2.75f;
+
+        if (x < 1 / D1) return N1 * x * x;
+        if (x < 2 / D1) return N1 * (x -= 1.5f / D1) * x + 0.75f;
+        if (x < 2.5f / D1) return N1 * (x -= 2.25f / D1) * x + 0.9375f;
+        return N1 * (x -= 2.625f / D1) * x + 0.984375f;
     }
-    private static float EaseInOutBounce(float t) =>
-        t < 0.5f ? EaseInBounce(t * 2) * 0.5f : EaseOutBounce(t * 2 - 1) * 0.5f + 0.5f;
+
+    public static float EaseInOutBounce(float x) =>
+        x < 0.5f ? (1 - EaseOutBounce(1 - 2 * x)) / 2 :
+                  (1 + EaseOutBounce(2 * x - 1)) / 2;
 }
