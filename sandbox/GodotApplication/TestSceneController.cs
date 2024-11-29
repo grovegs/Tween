@@ -15,7 +15,7 @@ public partial class TestSceneController : Node3D
     {
         _context = new TweenerContext();
 		_cube.MoveXTo(_cube.GlobalPosition.X + 2f, 5f, _context)
-		.Ease(EaseType.EaseInBack)
+		.Ease(EaseType.InBack)
 		.OnComplete(() => GD.Print("Completed"))
 		.OnUpdate<float>(position => {
 			GD.Print(position);
