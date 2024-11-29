@@ -61,19 +61,22 @@ internal struct Tween<T> : ITween<T>
         }
     }
 
-    public void SetOnComplete(Action onComplete)
+    public ITween SetOnComplete(Action onComplete)
     {
         _onComplete += onComplete;
+        return this;
     }
 
-    public void SetOnUpdate(Action<T> onUpdate)
+    public ITween SetOnUpdate(Action<T> onUpdate)
     {
         _onUpdate += onUpdate;
+        return this;
     }
 
-    public void SetEase(EaseType easeType)
+    public ITween SetEase(EaseType easeType)
     {
         _easeType = easeType;
+        return this;
     }
 
     public void Pause()
