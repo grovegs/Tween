@@ -1,5 +1,3 @@
-using System;
-
 using GroveGames.Tween.Core;
 
 namespace GroveGames.Tween.Context;
@@ -15,13 +13,22 @@ public class TweenerContext
         _killedTweens = [];
     }
 
-    public ITween Create<T>(T start, T end, float duration, Func<T, T, float, T> lerpFunc, bool autoPlay)
+    public ITween CreateTween<T>(T start, T end, float duration, Func<T, T, float, T> lerpFunc, bool autoPlay)
     {
         ITween tween = new Tween<T>(start, end, duration, lerpFunc: lerpFunc, autoPlay);
         tween.SetOnComplete(() => _killedTweens.Add(tween));
         _tweens.Add(tween);
 
         return tween;
+    }
+
+    public ISequence CreateSequnce()
+    {
+        ISequence sequence = new Sequence();
+        sequence.SetOnComplete(() => _killedTweens.Add(sequence));
+        _tweens.Add(sequence);
+
+        return sequence;
     }
 
     public void Update(float deltaTime)

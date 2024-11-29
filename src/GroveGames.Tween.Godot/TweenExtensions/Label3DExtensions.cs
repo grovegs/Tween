@@ -11,7 +11,7 @@ public static class Label3DExtensions
     public static TweenBuilder FadeTo(this Label3D source, float target, float duration, TweenerContext context, bool autoPlay = true)
     {
         var alpha = source.Modulate.A;
-        var builder = context.Create(alpha, target, duration, LerpFunctions.FloatLerp, autoPlay);
+        var builder = context.CreateTween(alpha, target, duration, LerpFunctions.FloatLerp, autoPlay);
         builder.OnUpdate<float>(newAlpha =>
         {
             var modulate = source.Modulate;
