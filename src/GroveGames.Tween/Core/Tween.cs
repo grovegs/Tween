@@ -22,8 +22,8 @@ internal struct Tween<T> : ITween<T>
     private readonly Func<T> _startValueFunc;
     private readonly Func<T> _endValueFunc;
 
-    private Action? _onComplete;
-    private Action<T>? _onUpdate;
+    private Action _onComplete;
+    private Action<T> _onUpdate;
 
     private EaseType _easeType;
 
@@ -68,22 +68,19 @@ internal struct Tween<T> : ITween<T>
         }
     }
 
-    public ITween SetOnComplete(Action onComplete)
+    public void SetOnComplete(Action onComplete)
     {
         _onComplete += onComplete;
-        return this;
     }
 
-    public ITween SetOnUpdate(Action<T> onUpdate)
+    public void SetOnUpdate(Action<T> onUpdate)
     {
         _onUpdate += onUpdate;
-        return this;
     }
 
-    public ITween SetEase(EaseType easeType)
+    public void SetEase(EaseType easeType)
     {
         _easeType = easeType;
-        return this;
     }
 
     public void Pause()

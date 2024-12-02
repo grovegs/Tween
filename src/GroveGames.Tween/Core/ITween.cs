@@ -4,8 +4,8 @@ namespace GroveGames.Tween.Core;
 
 public interface ITween
 {
-    ITween SetEase(EaseType easeType);
-    ITween SetOnComplete(Action onComplete);
+    void SetEase(EaseType easeType);
+    void SetOnComplete(Action onComplete);
     void Stop(bool complete);
     void Update(float deltaTime);
     void Pause();
@@ -17,5 +17,5 @@ public interface ITween
 
 public interface ITween<T> : ITween
 {
-    ITween SetOnUpdate(Action<T> onUpdate);
+    void SetOnUpdate(Action<T> onUpdate);
 }
