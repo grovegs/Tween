@@ -47,6 +47,7 @@ public class TweenerContext
 
             if (!tween.IsRunning)
             {
+                _killedTweens.Add(tween);
                 continue;
             }
 
