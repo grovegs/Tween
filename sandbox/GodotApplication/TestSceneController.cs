@@ -21,16 +21,16 @@ public partial class TestSceneController : Node3D
 		var moveRightTween = _cube.MoveXTo(_cube.GlobalPosition.X + 2f, 5f, _context);
 		moveRightTween.SetOnComplete(() => GD.Print("First Tween is Completed"));
 		moveRightTween.SetEase(EaseType.InBack);
-		sequence.Append(in moveRightTween);
+		sequence.Append(moveRightTween);
 
 		var rotateTween = _cube.RotateYTo(360, 5f, _context);
-		sequence.Join(in rotateTween);
+		sequence.Join(rotateTween);
 
 		sequence.AppendInterval(1f);
 
 		var moveLeftTween = _cube.MoveXTo(_cube.GlobalPosition.X, 5f, _context);
 		moveLeftTween.SetOnComplete(() => GD.Print("Second Tween is Completed"));
-		sequence.Append(in moveLeftTween);
+		sequence.Append(moveLeftTween);
 
 		sequence.SetOnComplete(() => GD.Print("Sequence is Completed"));
     }
