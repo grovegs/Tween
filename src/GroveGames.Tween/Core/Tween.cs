@@ -15,23 +15,30 @@ internal struct Tween<T> : ITween<T>
     private bool _isRunning;
     private bool _isPlaying;
 
-    private readonly T _startValue;
-    private readonly T _endValue;
+    private T _startValue;
+    private T _endValue;
 
     private readonly Func<T, T, float, T> _lerpFunction;
+    private readonly Func<T> _startValueFunc;
+    private readonly Func<T> _endValueFunc;
+
     private Action? _onComplete;
     private Action<T>? _onUpdate;
 
     private EaseType _easeType;
 
-    internal Tween(T start, T end, float duration, Func<T, T, float, T> lerpFunc, bool autoStart)
+    internal Tween(Func<T> start, Func<T> end, float duration, Func<T, T, float, T> lerpFunc, bool autoStart)
     {
-        _startValue = start;
-        _endValue = end;
+        _startValueFunc = start;
+        _endValueFunc = end;
         _duration = duration;
         _lerpFunction = lerpFunc;
         _isRunning = true;
-        _isPlaying = autoStart;
+
+        if (autoStart)
+        {
+            Play();
+        }
     }
 
     public void Update(float deltaTime)
@@ -97,6 +104,8 @@ internal struct Tween<T> : ITween<T>
 
     public void Play()
     {
+        _startValue = _startValueFunc();
+        _endValue = _endValueFunc();
         _isPlaying = true;
     }
 }

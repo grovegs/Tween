@@ -8,6 +8,7 @@ namespace GroveGames.Tween.TweenExtensions;
 
 public static class Transform3DExtensions
 {
+    /*
     public static ITween MoveTo(this Transform3D source, Vector3 target, float duration, TweenerContext context, bool autoPlay = true)
     {
         var builder = context.CreateTween(source.Origin, target, duration, LerpFunctions.Vector3Lerp, autoPlay);
@@ -158,4 +159,5 @@ public static class Transform3DExtensions
         });
         return builder;
     }
+    */
 }

@@ -8,16 +8,18 @@ namespace GroveGames.Tween.TweenExtensions;
 
 public static class Node3DExtensions
 {
+    /*
     public static ITween MoveTo(this Node3D source, Vector3 target, float duration, TweenerContext context, bool autoPlay = true)
     {
         var builder = context.CreateTween(source.GlobalPosition, target, duration, LerpFunctions.Vector3Lerp, autoPlay);
         ((ITween<Vector3>)builder).SetOnUpdate(position => source.GlobalPosition = position);
         return builder;
     }
+    */
 
-    public static ITween MoveXTo(this Node3D source, float target, float duration, TweenerContext context, bool autoPlay = true)
+    public static ITween MoveXTo(this Node3D source, float target, float duration, TweenerContext context, bool autoPlay = false)
     {
-        var builder = context.CreateTween(source.GlobalPosition.X, target, duration, LerpFunctions.FloatLerp, autoPlay);
+        var builder = context.CreateTween(() => source.GlobalPosition.X, () => target, duration, LerpFunctions.FloatLerp, autoPlay);
         ((ITween<float>)builder).SetOnUpdate(positionX =>
         {
             var globalPosition = source.GlobalPosition;
@@ -26,6 +28,8 @@ public static class Node3DExtensions
         });
         return builder;
     }
+
+    /*
 
     public static ITween MoveYTo(this Node3D source, float target, float duration, TweenerContext context, bool autoPlay = true)
     {
@@ -183,4 +187,5 @@ public static class Node3DExtensions
         });
         return builder;
     }
+    */
 }

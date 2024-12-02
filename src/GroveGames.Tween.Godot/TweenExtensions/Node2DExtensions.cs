@@ -8,6 +8,7 @@ namespace GroveGames.Tween.TweenExtensions;
 
 public static class Node2DExtensions
 {
+    /*
     public static ITween MoveTo(this Node2D source, Vector2 target, float duration, TweenerContext context, bool autoPlay = true)
     {
         var builder = context.CreateTween(source.GlobalPosition, target, duration, LerpFunctions.Vector2Lerp, autoPlay);
@@ -114,4 +115,5 @@ public static class Node2DExtensions
         });
         return builder;
     }
+    */
 }

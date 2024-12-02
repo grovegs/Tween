@@ -13,7 +13,7 @@ public class TweenerContext
         _killedTweens = [];
     }
 
-    public ITween CreateTween<T>(T start, T end, float duration, Func<T, T, float, T> lerpFunc, bool autoPlay)
+    public ITween CreateTween<T>(Func<T> start, Func<T> end, float duration, Func<T, T, float, T> lerpFunc, bool autoPlay)
     {
         ITween tween = new Tween<T>(start, end, duration, lerpFunc: lerpFunc, autoPlay);
         tween.SetOnComplete(() => _killedTweens.Add(tween));
