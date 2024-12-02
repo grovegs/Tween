@@ -105,7 +105,7 @@ public static class Node2DExtensions
 
     public static ITween ScaleYTo(this Node2D source, float target, float duration, TweenerContext context, bool autoPlay = true)
     {
-        var tween = context.CreateTween(source.Scale.Y, target, duration, LerpFunctions.FloatLerp, autoPlay);
+        var tween = context.CreateTween(() => source.Scale.Y, () => target, duration, LerpFunctions.FloatLerp, autoPlay);
         ((ITween<float>)tween).SetOnUpdate(scaleY =>
         {
             var scale = source.Scale;

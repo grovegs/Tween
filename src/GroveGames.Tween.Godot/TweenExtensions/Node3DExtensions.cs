@@ -176,7 +176,7 @@ public static class Node3DExtensions
 
     public static ITween ScaleZTo(this Node3D source, float target, float duration, TweenerContext context, bool autoPlay = true)
     {
-        var tween = context.CreateTween(source.Scale.Z, target, duration, LerpFunctions.FloatLerp, autoPlay);
+        var tween = context.CreateTween(() => source.Scale.Z, () => target, duration, LerpFunctions.FloatLerp, autoPlay);
         ((ITween<float>)tween).SetOnUpdate(scaleZ =>
         {
             var scale = source.Scale;
