@@ -8,18 +8,16 @@ namespace GroveGames.Tween.TweenExtensions;
 
 public static class Label3DExtensions
 {
-    /*
     public static ITween FadeTo(this Label3D source, float target, float duration, TweenerContext context, bool autoPlay = true)
     {
         var alpha = source.Modulate.A;
-        var builder = context.CreateTween(alpha, target, duration, LerpFunctions.FloatLerp, autoPlay);
-        ((ITween<float>)builder).SetOnUpdate(newAlpha =>
+        var tween = context.CreateTween(() => alpha, () => target, duration, LerpFunctions.FloatLerp, autoPlay);
+        ((ITween<float>)tween).SetOnUpdate(newAlpha =>
         {
             var modulate = source.Modulate;
             modulate.A = target;
             source.Modulate = modulate;
         });
-        return builder;
+        return tween;
     }
-    */
 }
