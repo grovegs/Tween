@@ -14,17 +14,27 @@ public partial class TestSceneController : Node3D
     public override void _Ready()
     {
         _context = new TweenerContext();
-		_cube.MoveXTo(_cube.GlobalPosition.X + 2f, 5f, _context)
-		.Ease(EaseType.InBack)
-		.OnComplete(() => GD.Print("Completed"))
-		.OnUpdate<float>(position => {
-			GD.Print(position);
-		});
+		var sequence = _context.CreateSequnce();
 
-		_cube.RotateYTo(360, 5f, _context);
+		var moveUpTween = _cube.MoveLocalYTo(_cube.GlobalPosition.Y + 0.5f, 5f, _context);
+
+		var moveRightTween = _cube.MoveXTo(_cube.GlobalPosition.X + 2f, 5f, _context);
+		moveRightTween.SetOnComplete(() => GD.Print("First Tween is Completed"));
+		moveRightTween.SetEase(EaseType.InBack);
+		sequence.Append(in moveRightTween);
+
+		var rotateTween = _cube.RotateYTo(360, 5f, _context);
+		sequence.Join(in rotateTween);
+
+		sequence.AppendInterval(1f);
+
+		var moveLeftTween = _cube.MoveXTo(_cube.GlobalPosition.X, 5f, _context);
+		moveLeftTween.SetOnComplete(() => GD.Print("Second Tween is Completed"));
+		sequence.Append(in moveLeftTween);
+
+		sequence.SetOnComplete(() => GD.Print("Sequence is Completed"));
     }
 
-	// Called every frame. 'delta' is the elapsed time since the previous frame.
 	public override void _Process(double delta)
 	{
 		_context.Update((float)delta);
