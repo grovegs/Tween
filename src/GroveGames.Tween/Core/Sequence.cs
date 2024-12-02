@@ -1,5 +1,3 @@
-using System;
-
 using GroveGames.Tween.Easing;
 
 namespace GroveGames.Tween.Core;
@@ -35,17 +33,18 @@ internal class Sequence : ISequence
 
     private float _currentInterval;
     private float _elapsedTime;
+    private float _duration;
 
     private bool _isPlaying;
     private bool _isRunning;
 
     public bool IsRunning => _isRunning;
     public bool IsPlaying => _isPlaying;
-    public float Duration => _currentInterval;
+    public float Duration => _duration;
 
     private EaseType _easeType;
 
-    private Action? _onComplete;
+    private Action _onComplete;
 
     public Sequence()
     {
@@ -63,6 +62,8 @@ internal class Sequence : ISequence
         {
             _currentInterval += _sequenceTweenElements[^1].Tween.Duration;
         }
+
+        _duration += tween.Duration;
         var element = new SequenceTweenElement(_currentInterval, in tween);
         _sequenceTweenElements.Add(element);
         return this;
@@ -86,21 +87,7 @@ internal class Sequence : ISequence
     public ISequence AppendInterval(float interval)
     {
         _currentInterval += interval;
-        return this;
-    }
-
-    public ISequence Insert(float t, in ITween tween)
-    {
-        tween.Pause();
-        var element = new SequenceTweenElement(t, in tween);
-        _sequenceTweenElements.Add(element);
-        return this;
-    }
-
-    public ISequence InsertCallback(float t, Action callback)
-    {
-        var element = new SequenceCallbackElement(t, callback);
-        _sequenceCallbackElements.Add(element);
+        _duration += interval;
         return this;
     }
 
@@ -114,16 +101,14 @@ internal class Sequence : ISequence
         _isPlaying = true;
     }
 
-    public ITween SetEase(EaseType easeType)
+    public void SetEase(EaseType easeType)
     {
-        _easeType = easeType;
-        return this;
+        _easeType = easeType; ;
     }
 
-    public ITween SetOnComplete(Action onComplete)
+    public void SetOnComplete(Action onComplete)
     {
         _onComplete += onComplete;
-        return this;
     }
 
     public void Stop(bool complete)
@@ -139,20 +124,20 @@ internal class Sequence : ISequence
         }
 
         _elapsedTime += deltaTime;
-       // var progress = _elapsedTime / Duration;
-       // var easedTime = deltaTime * EaseCalculations.Evaluate(_easeType, progress);
-       // _elapsedTime = easedTime * Duration;
+        if (_elapsedTime >= _duration)
+        {
+            _isRunning = false;
+        }
+        // var progress = _elapsedTime / Duration;
+        // var easedTime = deltaTime * EaseCalculations.Evaluate(_easeType, progress);
+        // _elapsedTime = easedTime * Duration;
 
         for (var i = 0; i < _sequenceTweenElements.Count; i++)
         {
             var currentElement = _sequenceTweenElements[i];
-            if (_elapsedTime >= currentElement.ExecutionTime && currentElement.Tween.IsRunning)
+            if (_elapsedTime >= currentElement.ExecutionTime && currentElement.Tween.IsRunning && !currentElement.Tween.IsPlaying)
             {
                 currentElement.Tween.Play();
-            }
-
-            else if (_elapsedTime >= currentElement.ExecutionTime && !currentElement.Tween.IsRunning)
-            {
                 _sequenceTweenElements.RemoveAt(i);
             }
         }
@@ -167,10 +152,9 @@ internal class Sequence : ISequence
             }
         }
 
-        if (_sequenceTweenElements.Count == 0)
+        if (!_isRunning)
         {
             _onComplete?.Invoke();
-            _isRunning = false;
         }
     }
 
