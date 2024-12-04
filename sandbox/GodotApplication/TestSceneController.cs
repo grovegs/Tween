@@ -27,6 +27,9 @@ public partial class TestSceneController : Node3D
 		var moveLeftTween = _cube.MoveXTo(_cube.GlobalPosition.X, 2f, _context);
 		moveLeftTween.SetOnComplete(() => GD.Print("Second Tween is Completed"));
 
+		var scaleTween = _cube.ScaleTo(Vector3.One, 1f, _context);
+		scaleTween.SetEase(EaseType.OutBack);
+
 		sequence
 		.Then(moveRightTween)
 		.With(rotateTween)
@@ -36,6 +39,7 @@ public partial class TestSceneController : Node3D
 		.Wait(3f)
 		.Callback(() => GD.Print("Callback 2 invoke"))
 		.Then(moveLeftTween)
+		.Then(scaleTween)
 		.SetOnComplete(() => GD.Print("Sequence is Completed"));
 	}
 
