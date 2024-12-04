@@ -34,6 +34,7 @@ internal class Sequence : ISequence
     private float _currentInterval;
     private float _elapsedTime;
     private float _duration;
+    private float _lastAppendDuration;
 
     private bool _isPlaying;
     private bool _isRunning;
@@ -58,12 +59,10 @@ internal class Sequence : ISequence
     public ISequence Append(ITween tween)
     {
         tween.Pause();
-        if (_sequenceTweenElements.Count > 0)
-        {
-            _currentInterval += _sequenceTweenElements[^1].Tween.Duration;
-        }
 
+        _currentInterval += _lastAppendDuration;
         _duration += tween.Duration;
+        _lastAppendDuration = tween.Duration;
         var element = new SequenceTweenElement(_currentInterval, in tween);
         _sequenceTweenElements.Add(element);
         return this;
@@ -79,7 +78,7 @@ internal class Sequence : ISequence
 
     public ISequence AppendCallback(Action callback)
     {
-        var element = new SequenceCallbackElement(_currentInterval, callback);
+        var element = new SequenceCallbackElement(_currentInterval + _lastAppendDuration, callback);
         _sequenceCallbackElements.Add(element);
         return this;
     }
