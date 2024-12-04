@@ -2,8 +2,8 @@ namespace GroveGames.Tween.Core;
 
 public interface ISequence : ITween
 {
-    ISequence Append(ITween tween);
-    ISequence Join(ITween tween);
-    ISequence AppendInterval(float interval);
-    ISequence AppendCallback(Action callback);
+    ISequence Then(ITween tween);
+    ISequence With(ITween tween);
+    ISequence Wait(float duration);
+    ISequence Callback(Action callback);
 }

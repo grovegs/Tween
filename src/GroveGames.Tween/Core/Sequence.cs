@@ -55,7 +55,7 @@ internal class Sequence : ISequence
         _isPlaying = true;
     }
 
-    public ISequence Append(ITween tween)
+    public ISequence Then(ITween tween)
     {
         tween.Pause();
 
@@ -66,7 +66,7 @@ internal class Sequence : ISequence
         return this;
     }
 
-    public ISequence Join(ITween tween)
+    public ISequence With(ITween tween)
     {
         tween.Pause();
         var element = new SequenceTweenElement(_duration - _lastAppendDuration, tween);
@@ -74,17 +74,17 @@ internal class Sequence : ISequence
         return this;
     }
 
-    public ISequence AppendCallback(Action callback)
+    public ISequence Callback(Action callback)
     {
         var element = new SequenceCallbackElement(_duration, callback);
         _sequenceCallbackElements.Add(element);
         return this;
     }
 
-    public ISequence AppendInterval(float interval)
+    public ISequence Wait(float duration)
     {
-        _lastAppendDuration = interval;
-        _duration += interval;
+        _lastAppendDuration = duration;
+        _duration += duration;
         return this;
     }
 

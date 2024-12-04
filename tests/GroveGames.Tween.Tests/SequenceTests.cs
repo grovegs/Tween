@@ -14,7 +14,7 @@ public class SequenceTests
         var sequence = new Sequence();
 
         // Act
-        sequence.Append(mockTween.Object);
+        sequence.Then(mockTween.Object);
 
         // Assert
         Assert.Equal(1f, sequence.Duration);
@@ -33,7 +33,7 @@ public class SequenceTests
         var sequence = new Sequence();
 
         // Act
-        sequence.Append(mockTween1.Object).Join(mockTween2.Object);
+        sequence.Then(mockTween1.Object).With(mockTween2.Object);
 
         // Assert
         Assert.Equal(2f, sequence.Duration);
@@ -51,7 +51,7 @@ public class SequenceTests
         var callbackMock = new Mock<Action>();
 
         var sequence = new Sequence();
-        sequence.Append(mockTween.Object).AppendCallback(callbackMock.Object);
+        sequence.Then(mockTween.Object).Callback(callbackMock.Object);
 
         // Act
         sequence.Update(1f);
