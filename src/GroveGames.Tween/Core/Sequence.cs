@@ -9,7 +9,7 @@ internal class Sequence : ISequence
         public readonly float ExecutionTime;
         public readonly ITween Tween;
 
-        public SequenceTweenElement(float time, in ITween tween)
+        public SequenceTweenElement(float time, ITween tween)
         {
             ExecutionTime = time;
             Tween = tween;
@@ -31,7 +31,6 @@ internal class Sequence : ISequence
     private readonly List<SequenceTweenElement> _sequenceTweenElements;
     private readonly List<SequenceCallbackElement> _sequenceCallbackElements;
 
-    private float _currentInterval;
     private float _elapsedTime;
     private float _duration;
     private float _lastAppendDuration;
@@ -60,10 +59,9 @@ internal class Sequence : ISequence
     {
         tween.Pause();
 
-        _currentInterval += _lastAppendDuration;
-        _duration += tween.Duration;
         _lastAppendDuration = tween.Duration;
-        var element = new SequenceTweenElement(_currentInterval, in tween);
+        var element = new SequenceTweenElement(_duration, tween);
+        _duration += tween.Duration;
         _sequenceTweenElements.Add(element);
         return this;
     }
@@ -71,21 +69,21 @@ internal class Sequence : ISequence
     public ISequence Join(ITween tween)
     {
         tween.Pause();
-        var element = new SequenceTweenElement(_currentInterval, in tween);
+        var element = new SequenceTweenElement(_duration - _lastAppendDuration, tween);
         _sequenceTweenElements.Add(element);
         return this;
     }
 
     public ISequence AppendCallback(Action callback)
     {
-        var element = new SequenceCallbackElement(_currentInterval + _lastAppendDuration, callback);
+        var element = new SequenceCallbackElement(_duration, callback);
         _sequenceCallbackElements.Add(element);
         return this;
     }
 
     public ISequence AppendInterval(float interval)
     {
-        _currentInterval += interval;
+        _lastAppendDuration = interval;
         _duration += interval;
         return this;
     }
@@ -160,7 +158,7 @@ internal class Sequence : ISequence
         _onComplete = null;
         _sequenceTweenElements.Clear();
         _sequenceCallbackElements.Clear();
-        _currentInterval = 0f;
+        _duration = 0f;
         _elapsedTime = 0f;
         _isPlaying = true;
         _isRunning = true;
