@@ -12,7 +12,7 @@ GroveGames.Tween is a lightweight and extensible tweening library for Godot, des
 - **Flexible Tweening**: Tween any type of value, including `float`, `Vector3`, and more.
 - **Ease Functions**: Use predefined easing functions to customize the motion.
 - **Sequences**: Chain tweens and callbacks for complex animations.
-- **Node Extensions**: Built-in support for animating properties of `Node3D`, `Node2D` and more `Godot Nodes`.
+- **Extensions**: Built-in support for animating properties of `Godot Nodes`, such as position, rotation, and scale.
 - **Customizable Behavior**: Easily add callbacks for updates and completions.
 
 ---
@@ -82,9 +82,9 @@ public class SequenceExample : Node3D
 
         var sequence = _tweenContext.CreateSequence();
         sequence
-            .Append(this.MoveTo(new Vector3(5, 5, 0), 2f, _tweenContext, false))
-            .AppendInterval(1f)
-            .AppendCallback(() => GD.Print("Reached target!"))
+            .Then(this.MoveTo(new Vector3(5, 5, 0), 2f, _tweenContext, false))
+            .Wait(1f)
+            .Callback(() => GD.Print("Reached target!"))
             .Play();
     }
 
@@ -95,9 +95,9 @@ public class SequenceExample : Node3D
 }
 ```
 
-### Node3D Extension Methods
+### Extension Methods
 
-The library includes handy extension methods for `Nodes`. Example `Node3D`:
+The library includes handy extension methods for `Node3D, Node2D, Transform3D, Transform2D, etc.` objects. Examples include:
 
 - `MoveTo(Vector3 target, float duration, TweenerContext context)`
 - `RotateTo(Vector3 targetDegrees, float duration, TweenerContext context)`
@@ -129,10 +129,10 @@ Each method has variations to animate specific axes (e.g., `MoveXTo`, `RotateYTo
 
 #### `ISequence`
 
-- `ISequence Append(ITween tween)`
-- `ISequence Join(ITween tween)`
-- `ISequence AppendInterval(float interval)`
-- `ISequence AppendCallback(Action callback)`
+- `ISequence Then(ITween tween)`
+- `ISequence With(ITween tween)`
+- `ISequence Wait(float interval)`
+- `ISequence Callback(Action callback)`
 - `void Reset()`
 
 ---
