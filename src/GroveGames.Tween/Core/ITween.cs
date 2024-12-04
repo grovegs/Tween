@@ -11,6 +11,7 @@ public interface ITween
     void Update(float deltaTime);
     void Pause();
     void Play();
+    void Reset();
     bool IsRunning { get; }
     bool IsPlaying { get; }
     float Duration { get; }

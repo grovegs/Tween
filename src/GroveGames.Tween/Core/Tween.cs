@@ -113,4 +113,12 @@ internal class Tween<T> : ITween<T>
     {
         _id = id;
     }
+
+    public void Reset()
+    {
+        _id = -1;
+        _elapsedTime = 0f;
+        _isPlaying = true;
+        _isRunning = true;
+    }
 }

@@ -6,5 +6,4 @@ public interface ISequence : ITween
     ISequence Join(ITween tween);
     ISequence AppendInterval(float interval);
     ISequence AppendCallback(Action callback);
-    void Reset();
 }

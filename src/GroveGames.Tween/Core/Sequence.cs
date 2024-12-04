@@ -164,6 +164,7 @@ internal class Sequence : ISequence
         _currentInterval = 0f;
         _elapsedTime = 0f;
         _isPlaying = true;
+        _isRunning = true;
     }
 
     public void SetId(int id)
