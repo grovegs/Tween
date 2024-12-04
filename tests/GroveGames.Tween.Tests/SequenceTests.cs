@@ -58,6 +58,11 @@ public class SequenceTests
         mockTween3.Setup(t => t.IsRunning).Returns(true);
         mockTween3.Setup(t => t.IsPlaying).Returns(false);
 
+        var mockTween4 = new Mock<ITween>();
+        mockTween4.Setup(t => t.Duration).Returns(1f);
+        mockTween4.Setup(t => t.IsRunning).Returns(true);
+        mockTween4.Setup(t => t.IsPlaying).Returns(false);
+
         var callbackMock = new Mock<Action>();
 
         var sequence = new Sequence();
@@ -65,7 +70,9 @@ public class SequenceTests
         .Then(mockTween1.Object)
         .Then(mockTween2.Object)
         .With(mockTween3.Object)
-        .Callback(callbackMock.Object);
+        .Callback(callbackMock.Object)
+        .Wait(1f)
+        .Then(mockTween4.Object);
 
         // Act
         sequence.Update(0.1f);
@@ -77,5 +84,7 @@ public class SequenceTests
 
         sequence.Update(0.9f);
         callbackMock.Verify(cb => cb.Invoke(), Times.Once);
+
+        mockTween4.Verify(t => t.Play(), Times.Never);
     }
 }
