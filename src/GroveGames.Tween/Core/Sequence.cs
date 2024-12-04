@@ -47,7 +47,7 @@ internal class Sequence : ISequence
 
     private Action _onComplete;
 
-    public Sequence()
+    internal Sequence()
     {
         _sequenceTweenElements = [];
         _sequenceCallbackElements = [];
