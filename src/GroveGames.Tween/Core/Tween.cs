@@ -9,8 +9,11 @@ internal struct Tween<T> : ITween<T>
 
     public readonly float Duration => _duration;
 
+    public readonly int Id => _id;
+
     private readonly float _duration;
     private float _elapsedTime;
+    private int _id;
 
     private bool _isRunning;
     private bool _isPlaying;
@@ -104,5 +107,10 @@ internal struct Tween<T> : ITween<T>
         _startValue = _startValueFunc();
         _endValue = _endValueFunc();
         _isPlaying = true;
+    }
+
+    public void SetId(int id)
+    {
+        _id = id;
     }
 }

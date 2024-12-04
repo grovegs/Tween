@@ -42,6 +42,9 @@ internal class Sequence : ISequence
     public bool IsPlaying => _isPlaying;
     public float Duration => _duration;
 
+    public int Id => _id;
+    private int _id;
+
     private EaseType _easeType;
 
     private Action _onComplete;
@@ -160,6 +163,7 @@ internal class Sequence : ISequence
 
     public void Reset()
     {
+        _id = -1;
         _onComplete = null;
         _sequenceTweenElements.Clear();
         _sequenceCallbackElements.Clear();
@@ -167,5 +171,10 @@ internal class Sequence : ISequence
         _elapsedTime = 0f;
         _isPlaying = true;
         _easeType = EaseType.Linear;
+    }
+
+    public void SetId(int id)
+    {
+        _id = id;
     }
 }
