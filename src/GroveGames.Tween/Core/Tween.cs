@@ -2,14 +2,14 @@ using GroveGames.Tween.Easing;
 
 namespace GroveGames.Tween.Core;
 
-internal struct Tween<T> : ITween<T>
+internal class Tween<T> : ITween<T>
 {
-    public readonly bool IsRunning => _isRunning;
-    public readonly bool IsPlaying => _isPlaying;
+    public bool IsRunning => _isRunning;
+    public bool IsPlaying => _isPlaying;
 
-    public readonly float Duration => _duration;
+    public float Duration => _duration;
 
-    public readonly int Id => _id;
+    public int Id => _id;
 
     private readonly float _duration;
     private float _elapsedTime;

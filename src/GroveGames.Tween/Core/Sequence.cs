@@ -58,7 +58,7 @@ internal class Sequence : ISequence
         _easeType = EaseType.Linear;
     }
 
-    public ISequence Append(in ITween tween)
+    public ISequence Append(ITween tween)
     {
         tween.Pause();
         if (_sequenceTweenElements.Count > 0)
@@ -72,7 +72,7 @@ internal class Sequence : ISequence
         return this;
     }
 
-    public ISequence Join(in ITween tween)
+    public ISequence Join(ITween tween)
     {
         tween.Pause();
         var element = new SequenceTweenElement(_currentInterval, in tween);
