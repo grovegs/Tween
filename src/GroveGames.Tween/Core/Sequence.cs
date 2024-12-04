@@ -45,8 +45,6 @@ internal class Sequence : ISequence
     public int Id => _id;
     private int _id;
 
-    private EaseType _easeType;
-
     private Action _onComplete;
 
     public Sequence()
@@ -55,7 +53,6 @@ internal class Sequence : ISequence
         _sequenceCallbackElements = [];
         _isRunning = true;
         _isPlaying = true;
-        _easeType = EaseType.Linear;
     }
 
     public ISequence Append(ITween tween)
@@ -106,7 +103,7 @@ internal class Sequence : ISequence
 
     public void SetEase(EaseType easeType)
     {
-        _easeType = easeType; ;
+        // sequences don't have easing
     }
 
     public void SetOnComplete(Action onComplete)
@@ -131,9 +128,6 @@ internal class Sequence : ISequence
         {
             _isRunning = false;
         }
-        // var progress = _elapsedTime / Duration;
-        // var easedTime = deltaTime * EaseCalculations.Evaluate(_easeType, progress);
-        // _elapsedTime = easedTime * Duration;
 
         for (var i = 0; i < _sequenceTweenElements.Count; i++)
         {
@@ -170,7 +164,6 @@ internal class Sequence : ISequence
         _currentInterval = 0f;
         _elapsedTime = 0f;
         _isPlaying = true;
-        _easeType = EaseType.Linear;
     }
 
     public void SetId(int id)
