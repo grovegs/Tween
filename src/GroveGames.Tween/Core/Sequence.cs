@@ -4,32 +4,7 @@ namespace GroveGames.Tween.Core;
 
 internal class Sequence : ISequence
 {
-    private readonly struct SequenceTweenElement
-    {
-        public readonly float ExecutionTime;
-        public readonly ITween Tween;
-
-        public SequenceTweenElement(float time, ITween tween)
-        {
-            ExecutionTime = time;
-            Tween = tween;
-        }
-    }
-
-    private readonly struct SequenceCallbackElement
-    {
-        public readonly float ExecutionTime;
-        public readonly Action Callback;
-
-        public SequenceCallbackElement(float time, Action callback)
-        {
-            ExecutionTime = time;
-            Callback = callback;
-        }
-    }
-
-    private readonly List<SequenceTweenElement> _sequenceTweenElements;
-    private readonly List<SequenceCallbackElement> _sequenceCallbackElements;
+    private readonly List<ISequenceExecutable> _sequenceExecutables;
 
     private float _elapsedTime;
     private float _duration;
@@ -49,8 +24,7 @@ internal class Sequence : ISequence
 
     internal Sequence()
     {
-        _sequenceTweenElements = [];
-        _sequenceCallbackElements = [];
+        _sequenceExecutables = [];
         _isRunning = true;
         _isPlaying = true;
     }
@@ -60,24 +34,24 @@ internal class Sequence : ISequence
         tween.Pause();
 
         _lastAppendDuration = tween.Duration;
-        var element = new SequenceTweenElement(_duration, tween);
+        var element = new TweenSequenceExecetable(tween, _duration);
         _duration += tween.Duration;
-        _sequenceTweenElements.Add(element);
+        _sequenceExecutables.Add(element);
         return this;
     }
 
     public ISequence With(ITween tween)
     {
         tween.Pause();
-        var element = new SequenceTweenElement(_duration - _lastAppendDuration, tween);
-        _sequenceTweenElements.Add(element);
+        var element = new TweenSequenceExecetable(tween, _duration - _lastAppendDuration);
+        _sequenceExecutables.Add(element);
         return this;
     }
 
     public ISequence Callback(Action callback)
     {
-        var element = new SequenceCallbackElement(_duration, callback);
-        _sequenceCallbackElements.Add(element);
+        var element = new ActionSequenceExecutable(callback, _duration);
+        _sequenceExecutables.Add(element);
         return this;
     }
 
@@ -100,7 +74,7 @@ internal class Sequence : ISequence
 
     public void SetEase(EaseType easeType)
     {
-        // sequences don't have easing
+        throw new ArgumentException("Sequences don't have easings");
     }
 
     public void SetOnComplete(Action onComplete)
@@ -126,23 +100,13 @@ internal class Sequence : ISequence
             _isRunning = false;
         }
 
-        for (var i = 0; i < _sequenceTweenElements.Count; i++)
+        for (var i = _sequenceExecutables.Count - 1; i >= 0; i--)
         {
-            var currentElement = _sequenceTweenElements[i];
-            if (_elapsedTime >= currentElement.ExecutionTime && currentElement.Tween.IsRunning && !currentElement.Tween.IsPlaying)
+            var currentElement = _sequenceExecutables[i];
+            if (_elapsedTime >= currentElement.ExecutionTime)
             {
-                currentElement.Tween.Play();
-                _sequenceTweenElements.RemoveAt(i);
-            }
-        }
-
-        for (var i = 0; i < _sequenceCallbackElements.Count; i++)
-        {
-            var currentCallback = _sequenceCallbackElements[i];
-            if (_elapsedTime >= currentCallback.ExecutionTime)
-            {
-                currentCallback.Callback?.Invoke();
-                _sequenceCallbackElements.RemoveAt(i);
+                currentElement.Execute();
+                _sequenceExecutables.RemoveAt(i);
             }
         }
 
@@ -154,10 +118,9 @@ internal class Sequence : ISequence
 
     public void Reset()
     {
+        _sequenceExecutables.Clear();
         _id = -1;
         _onComplete = null;
-        _sequenceTweenElements.Clear();
-        _sequenceCallbackElements.Clear();
         _duration = 0f;
         _elapsedTime = 0f;
         _isPlaying = true;
