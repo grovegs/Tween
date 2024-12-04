@@ -8,7 +8,7 @@ namespace GroveGames.Tween.TweenExtensions;
 
 public static class Transform2DExtensions
 {
-    public static ITween<Vector2> MoveTo(this Transform2D source, Vector2 target, float duration, TweenerContext context, bool autoPlay = true)
+    public static ITween MoveTo(this Transform2D source, Vector2 target, float duration, TweenerContext context, bool autoPlay = true)
     {
         var tween = context.CreateTween(() => source.Origin, () => target, duration, LerpFunctions.Vector2Lerp, autoPlay);
         tween.SetOnUpdate(position =>
@@ -20,7 +20,7 @@ public static class Transform2DExtensions
         return tween;
     }
 
-    public static ITween<float> MoveXTo(this Transform2D source, float target, float duration, TweenerContext context, bool autoPlay = true)
+    public static ITween MoveXTo(this Transform2D source, float target, float duration, TweenerContext context, bool autoPlay = true)
     {
         var tween = context.CreateTween(() => source.Origin.X, () => target, duration, LerpFunctions.FloatLerp, autoPlay);
         tween.SetOnUpdate(positionX =>
@@ -34,7 +34,7 @@ public static class Transform2DExtensions
         return tween;
     }
 
-    public static ITween<float> MoveYTo(this Transform2D source, float target, float duration, TweenerContext context, bool autoPlay = true)
+    public static ITween MoveYTo(this Transform2D source, float target, float duration, TweenerContext context, bool autoPlay = true)
     {
         var tween = context.CreateTween(() => source.Origin.Y, () => target, duration, LerpFunctions.FloatLerp, autoPlay);
         tween.SetOnUpdate(positionY =>
@@ -48,7 +48,7 @@ public static class Transform2DExtensions
         return tween;
     }
 
-    public static ITween<float> RotateTo(this Transform2D source, float target, float duration, TweenerContext context, bool autoPlay = true)
+    public static ITween RotateTo(this Transform2D source, float target, float duration, TweenerContext context, bool autoPlay = true)
     {
         var tween = context.CreateTween(() => source.Rotation, () => target, duration, LerpFunctions.FloatLerp, autoPlay);
         tween.SetOnUpdate(rotation =>
@@ -60,7 +60,7 @@ public static class Transform2DExtensions
         return tween;
     }
 
-    public static ITween<Vector2> ScaleTo(this Transform2D source, Vector2 target, float duration, TweenerContext context, bool autoPlay = true)
+    public static ITween ScaleTo(this Transform2D source, Vector2 target, float duration, TweenerContext context, bool autoPlay = true)
     {
         var tween = context.CreateTween(() => source.Scale, () => target, duration, LerpFunctions.Vector2Lerp, autoPlay);
         tween.SetOnUpdate(scale =>
@@ -72,7 +72,7 @@ public static class Transform2DExtensions
         return tween;
     }
 
-    public static ITween<float> ScaleXTo(this Transform2D source, float target, float duration, TweenerContext context, bool autoPlay = true)
+    public static ITween ScaleXTo(this Transform2D source, float target, float duration, TweenerContext context, bool autoPlay = true)
     {
         var tween = context.CreateTween(() => source.Scale.X, () => target, duration, LerpFunctions.FloatLerp, autoPlay);
         tween.SetOnUpdate(scaleX =>
@@ -86,7 +86,7 @@ public static class Transform2DExtensions
         return tween;
     }
 
-    public static ITween<float> ScaleYTo(this Transform2D source, float target, float duration, TweenerContext context, bool autoPlay = true)
+    public static ITween ScaleYTo(this Transform2D source, float target, float duration, TweenerContext context, bool autoPlay = true)
     {
         var tween = context.CreateTween(() => source.Scale.Y, () => target, duration, LerpFunctions.FloatLerp, autoPlay);
         tween.SetOnUpdate(scaleY =>
