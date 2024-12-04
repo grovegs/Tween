@@ -21,9 +21,9 @@ internal class Tween<T> : ITween<T>
     private T _startValue;
     private T _endValue;
 
-    private readonly Func<T, T, float, T> _lerpFunction;
-    private readonly Func<T> _startValueFunc;
-    private readonly Func<T> _endValueFunc;
+    private Func<T, T, float, T> _lerpFunction;
+    private Func<T> _startValueFunc;
+    private Func<T> _endValueFunc;
 
     private Action _onComplete;
     private Action<T> _onUpdate;
@@ -120,5 +120,11 @@ internal class Tween<T> : ITween<T>
         _elapsedTime = 0f;
         _isPlaying = true;
         _isRunning = true;
+        _onComplete = null;
+        _onUpdate = null;
+        _endValueFunc = null;
+        _lerpFunction = null;
+        _startValueFunc = null;
+        _easeType = EaseType.Linear;
     }
 }
