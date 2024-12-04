@@ -4,8 +4,8 @@ internal class TweenSequenceExecetable : ISequenceExecutable
 {
     public float ExecutionTime => _executionTime;
 
-    private readonly float _executionTime;
-    private readonly ITween _tween;
+    private float _executionTime;
+    private ITween _tween;
 
     public TweenSequenceExecetable(ITween tween, float executionTime)
     {
@@ -15,7 +15,13 @@ internal class TweenSequenceExecetable : ISequenceExecutable
 
     public void Execute()
     {
-        _tween.Play();
+        _tween?.Play();
+    }
+
+    public void Reset()
+    {
+        _tween = null;
+        _executionTime = 0f;
     }
 }
 
