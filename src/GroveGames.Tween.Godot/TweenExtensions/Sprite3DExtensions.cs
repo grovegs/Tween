@@ -15,7 +15,7 @@ public static class Sprite3DExtensions
         tween.SetOnUpdate(newAlpha =>
         {
             var modulate = source.Modulate;
-            modulate.A = target;
+            modulate.A = newAlpha;
             source.Modulate = modulate;
         });
         return tween;

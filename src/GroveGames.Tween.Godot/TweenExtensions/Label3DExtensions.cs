@@ -15,8 +15,11 @@ public static class Label3DExtensions
         tween.SetOnUpdate(newAlpha =>
         {
             var modulate = source.Modulate;
-            modulate.A = target;
+            var outlineModule = source.OutlineModulate;
+            modulate.A = newAlpha;
+            outlineModule.A = newAlpha;
             source.Modulate = modulate;
+            source.OutlineModulate = outlineModule;
         });
         return tween;
     }
