@@ -11,20 +11,38 @@ public partial class TestSceneController : Node3D
 	[Export] Node3D _cube;
 	TweenerContext _context;
 
-    public override void _Ready()
-    {
-        _context = new TweenerContext();
-		_cube.MoveXTo(_cube.GlobalPosition.X + 2f, 5f, _context)
-		.Ease(EaseType.InBack)
-		.OnComplete(() => GD.Print("Completed"))
-		.OnUpdate<float>(position => {
-			GD.Print(position);
-		});
+	public override void _Ready()
+	{
+		_context = new TweenerContext();
+		var sequence = _context.CreateSequnce();
 
-		_cube.RotateYTo(360, 5f, _context);
-    }
+		var moveUpTween = _cube.MoveLocalYTo(_cube.GlobalPosition.Y + 0.5f, 2f, _context);
 
-	// Called every frame. 'delta' is the elapsed time since the previous frame.
+		var moveRightTween = _cube.MoveXTo(_cube.GlobalPosition.X + 2f, 3f, _context);
+		moveRightTween.SetOnComplete(() => GD.Print("First Tween is Completed"));
+		moveRightTween.SetEase(EaseType.InBack);
+
+		var rotateTween = _cube.RotateYTo(360, 4f, _context);
+
+		var moveLeftTween = _cube.MoveXTo(_cube.GlobalPosition.X, 2f, _context);
+		moveLeftTween.SetOnComplete(() => GD.Print("Second Tween is Completed"));
+
+		var scaleTween = _cube.ScaleTo(Vector3.One, 1f, _context);
+		scaleTween.SetEase(EaseType.OutBack);
+
+		sequence
+		.Then(moveRightTween)
+		.With(rotateTween)
+		.Wait(1f)
+		.With(_cube.ScaleTo(_cube.Scale * 0.25f, 1f, _context))
+		.Callback(() => GD.Print("Callback 1 invoke"))
+		.Wait(3f)
+		.Callback(() => GD.Print("Callback 2 invoke"))
+		.Then(moveLeftTween)
+		.Then(scaleTween)
+		.SetOnComplete(() => GD.Print("Sequence is Completed"));
+	}
+
 	public override void _Process(double delta)
 	{
 		_context.Update((float)delta);

@@ -2,34 +2,46 @@ using GroveGames.Tween.Easing;
 
 namespace GroveGames.Tween.Core;
 
-internal struct Tween<T> : ITween<T>
+internal class Tween<T> : ITween<T>
 {
-    public readonly bool IsRunning => _isRunning;
-    public readonly bool IsPlaying => _isPlaying;
+    public bool IsRunning => _isRunning;
+    public bool IsPlaying => _isPlaying;
+
+    public float Duration => _duration;
+
+    public int Id => _id;
 
     private readonly float _duration;
     private float _elapsedTime;
+    private int _id;
 
     private bool _isRunning;
     private bool _isPlaying;
 
-    private readonly T _startValue;
-    private readonly T _endValue;
+    private T _startValue;
+    private T _endValue;
 
-    private readonly Func<T, T, float, T> _lerpFunction;
-    private Action? _onComplete;
-    private Action<T>? _onUpdate;
+    private Func<T, T, float, T> _lerpFunction;
+    private Func<T> _startValueFunc;
+    private Func<T> _endValueFunc;
+
+    private Action _onComplete;
+    private Action<T> _onUpdate;
 
     private EaseType _easeType;
 
-    internal Tween(T start, T end, float duration, Func<T, T, float, T> lerpFunc, bool autoStart)
+    internal Tween(Func<T> start, Func<T> end, float duration, Func<T, T, float, T> lerpFunc, bool autoStart)
     {
-        _startValue = start;
-        _endValue = end;
+        _startValueFunc = start;
+        _endValueFunc = end;
         _duration = duration;
         _lerpFunction = lerpFunc;
         _isRunning = true;
-        _isPlaying = autoStart;
+
+        if (autoStart)
+        {
+            Play();
+        }
     }
 
     public void Update(float deltaTime)
@@ -92,6 +104,27 @@ internal struct Tween<T> : ITween<T>
 
     public void Play()
     {
+        _startValue = _startValueFunc();
+        _endValue = _endValueFunc();
         _isPlaying = true;
+    }
+
+    public void SetId(int id)
+    {
+        _id = id;
+    }
+
+    public void Reset()
+    {
+        _id = -1;
+        _elapsedTime = 0f;
+        _isPlaying = true;
+        _isRunning = true;
+        _onComplete = null;
+        _onUpdate = null;
+        _endValueFunc = null;
+        _lerpFunction = null;
+        _startValueFunc = null;
+        _easeType = EaseType.Linear;
     }
 }

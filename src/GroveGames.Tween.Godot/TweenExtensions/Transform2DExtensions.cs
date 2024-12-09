@@ -8,22 +8,22 @@ namespace GroveGames.Tween.TweenExtensions;
 
 public static class Transform2DExtensions
 {
-    public static TweenBuilder MoveTo(this Transform2D source, Vector2 target, float duration, TweenerContext context, bool autoPlay = true)
+    public static ITween MoveTo(this Transform2D source, Vector2 target, float duration, TweenerContext context, bool autoPlay = true)
     {
-        var builder = context.Create(source.Origin, target, duration, LerpFunctions.Vector2Lerp, autoPlay);
-        builder.OnUpdate<Vector2>(position =>
-        {
-            var transform = source;
-            transform.Origin = position;
-            source = transform;
-        });
-        return builder;
+        var tween = context.CreateTween(() => source.Origin, () => target, duration, LerpFunctions.Vector2Lerp, autoPlay);
+        tween.SetOnUpdate(position =>
+         {
+             var transform = source;
+             transform.Origin = position;
+             source = transform;
+         });
+        return tween;
     }
 
-    public static TweenBuilder MoveXTo(this Transform2D source, float target, float duration, TweenerContext context, bool autoPlay = true)
+    public static ITween MoveXTo(this Transform2D source, float target, float duration, TweenerContext context, bool autoPlay = true)
     {
-        var builder = context.Create(source.Origin.X, target, duration, LerpFunctions.FloatLerp, autoPlay);
-        builder.OnUpdate<float>(positionX =>
+        var tween = context.CreateTween(() => source.Origin.X, () => target, duration, LerpFunctions.FloatLerp, autoPlay);
+        tween.SetOnUpdate(positionX =>
         {
             var transform = source;
             var origin = transform.Origin;
@@ -31,13 +31,13 @@ public static class Transform2DExtensions
             transform.Origin = origin;
             source = transform;
         });
-        return builder;
+        return tween;
     }
 
-    public static TweenBuilder MoveYTo(this Transform2D source, float target, float duration, TweenerContext context, bool autoPlay = true)
+    public static ITween MoveYTo(this Transform2D source, float target, float duration, TweenerContext context, bool autoPlay = true)
     {
-        var builder = context.Create(source.Origin.Y, target, duration, LerpFunctions.FloatLerp, autoPlay);
-        builder.OnUpdate<float>(positionY =>
+        var tween = context.CreateTween(() => source.Origin.Y, () => target, duration, LerpFunctions.FloatLerp, autoPlay);
+        tween.SetOnUpdate(positionY =>
         {
             var transform = source;
             var origin = transform.Origin;
@@ -45,37 +45,37 @@ public static class Transform2DExtensions
             transform.Origin = origin;
             source = transform;
         });
-        return builder;
+        return tween;
     }
 
-    public static TweenBuilder RotateTo(this Transform2D source, float target, float duration, TweenerContext context, bool autoPlay = true)
+    public static ITween RotateTo(this Transform2D source, float target, float duration, TweenerContext context, bool autoPlay = true)
     {
-        var builder = context.Create(source.Rotation, target, duration, LerpFunctions.FloatLerp, autoPlay);
-        builder.OnUpdate<float>(rotation =>
+        var tween = context.CreateTween(() => source.Rotation, () => target, duration, LerpFunctions.FloatLerp, autoPlay);
+        tween.SetOnUpdate(rotation =>
         {
             var transform = source;
             transform = transform.Rotated(Mathf.DegToRad(rotation) - transform.Rotation);
             source = transform;
         });
-        return builder;
+        return tween;
     }
 
-    public static TweenBuilder ScaleTo(this Transform2D source, Vector2 target, float duration, TweenerContext context, bool autoPlay = true)
+    public static ITween ScaleTo(this Transform2D source, Vector2 target, float duration, TweenerContext context, bool autoPlay = true)
     {
-        var builder = context.Create(source.Scale, target, duration, LerpFunctions.Vector2Lerp, autoPlay);
-        builder.OnUpdate<Vector2>(scale =>
+        var tween = context.CreateTween(() => source.Scale, () => target, duration, LerpFunctions.Vector2Lerp, autoPlay);
+        tween.SetOnUpdate(scale =>
         {
             var transform = source;
             transform = transform.Scaled(scale / transform.Scale);
             source = transform;
         });
-        return builder;
+        return tween;
     }
 
-    public static TweenBuilder ScaleXTo(this Transform2D source, float target, float duration, TweenerContext context, bool autoPlay = true)
+    public static ITween ScaleXTo(this Transform2D source, float target, float duration, TweenerContext context, bool autoPlay = true)
     {
-        var builder = context.Create(source.Scale.X, target, duration, LerpFunctions.FloatLerp, autoPlay);
-        builder.OnUpdate<float>(scaleX =>
+        var tween = context.CreateTween(() => source.Scale.X, () => target, duration, LerpFunctions.FloatLerp, autoPlay);
+        tween.SetOnUpdate(scaleX =>
         {
             var transform = source;
             var currentScale = transform.Scale;
@@ -83,13 +83,13 @@ public static class Transform2DExtensions
             transform = transform.Scaled(scale);
             source = transform;
         });
-        return builder;
+        return tween;
     }
 
-    public static TweenBuilder ScaleYTo(this Transform2D source, float target, float duration, TweenerContext context, bool autoPlay = true)
+    public static ITween ScaleYTo(this Transform2D source, float target, float duration, TweenerContext context, bool autoPlay = true)
     {
-        var builder = context.Create(source.Scale.Y, target, duration, LerpFunctions.FloatLerp, autoPlay);
-        builder.OnUpdate<float>(scaleY =>
+        var tween = context.CreateTween(() => source.Scale.Y, () => target, duration, LerpFunctions.FloatLerp, autoPlay);
+        tween.SetOnUpdate(scaleY =>
         {
             var transform = source;
             var currentScale = transform.Scale;
@@ -97,6 +97,6 @@ public static class Transform2DExtensions
             transform = transform.Scaled(scale);
             source = transform;
         });
-        return builder;
+        return tween;
     }
 }

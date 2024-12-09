@@ -8,110 +8,110 @@ namespace GroveGames.Tween.TweenExtensions;
 
 public static class Node2DExtensions
 {
-    public static TweenBuilder MoveTo(this Node2D source, Vector2 target, float duration, TweenerContext context, bool autoPlay = true)
+    public static ITween MoveTo(this Node2D source, Vector2 target, float duration, TweenerContext context, bool autoPlay = true)
     {
-        var builder = context.Create(source.GlobalPosition, target, duration, LerpFunctions.Vector2Lerp, autoPlay);
-        builder.OnUpdate<Vector2>(position => source.GlobalPosition = position);
-        return builder;
+        var tween = context.CreateTween(() => source.GlobalPosition, () => target, duration, LerpFunctions.Vector2Lerp, autoPlay);
+        tween.SetOnUpdate(position => source.GlobalPosition = position);
+        return tween;
     }
 
-    public static TweenBuilder MoveLocalTo(this Node2D source, Vector2 target, float duration, TweenerContext context, bool autoPlay = true)
+    public static ITween MoveLocalTo(this Node2D source, Vector2 target, float duration, TweenerContext context, bool autoPlay = true)
     {
-        var builder = context.Create(source.Position, target, duration, LerpFunctions.Vector2Lerp, autoPlay);
-        builder.OnUpdate<Vector2>(position => source.Position = position);
-        return builder;
+        var tween = context.CreateTween(() => source.Position, () => target, duration, LerpFunctions.Vector2Lerp, autoPlay);
+        tween.SetOnUpdate(position => source.Position = position);
+        return tween;
     }
 
-    public static TweenBuilder MoveXTo(this Node2D source, float target, float duration, TweenerContext context, bool autoPlay = true)
+    public static ITween MoveXTo(this Node2D source, float target, float duration, TweenerContext context, bool autoPlay = true)
     {
-        var builder = context.Create(source.GlobalPosition.X, target, duration, LerpFunctions.FloatLerp, autoPlay);
-        builder.OnUpdate<float>(positionX =>
+        var tween = context.CreateTween(() => source.GlobalPosition.X, () => target, duration, LerpFunctions.FloatLerp, autoPlay);
+        tween.SetOnUpdate(positionX =>
         {
             var globalPosition = source.GlobalPosition;
             globalPosition.X = positionX;
             source.GlobalPosition = globalPosition;
         });
-        return builder;
+        return tween;
     }
 
-    public static TweenBuilder MoveLocalXTo(this Node2D source, float target, float duration, TweenerContext context, bool autoPlay = true)
+    public static ITween MoveLocalXTo(this Node2D source, float target, float duration, TweenerContext context, bool autoPlay = true)
     {
-        var builder = context.Create(source.Position.X, target, duration, LerpFunctions.FloatLerp, autoPlay);
-        builder.OnUpdate<float>(positionX =>
+        var tween = context.CreateTween(() => source.Position.X, () => target, duration, LerpFunctions.FloatLerp, autoPlay);
+        tween.SetOnUpdate(positionX =>
         {
             var localPosition = source.Position;
             localPosition.X = positionX;
             source.Position = localPosition;
         });
-        return builder;
+        return tween;
     }
 
-    public static TweenBuilder MoveYTo(this Node2D source, float target, float duration, TweenerContext context, bool autoPlay = true)
+    public static ITween MoveYTo(this Node2D source, float target, float duration, TweenerContext context, bool autoPlay = true)
     {
-        var builder = context.Create(source.GlobalPosition.Y, target, duration, LerpFunctions.FloatLerp, autoPlay);
-        builder.OnUpdate<float>(positionY =>
+        var tween = context.CreateTween(() => source.GlobalPosition.Y, () => target, duration, LerpFunctions.FloatLerp, autoPlay);
+        tween.SetOnUpdate(positionY =>
         {
             var globalPosition = source.GlobalPosition;
             globalPosition.Y = positionY;
             source.GlobalPosition = globalPosition;
         });
-        return builder;
+        return tween;
     }
 
-    public static TweenBuilder MoveLocalYTo(this Node2D source, float target, float duration, TweenerContext context, bool autoPlay = true)
+    public static ITween MoveLocalYTo(this Node2D source, float target, float duration, TweenerContext context, bool autoPlay = true)
     {
-        var builder = context.Create(source.Position.Y, target, duration, LerpFunctions.FloatLerp, autoPlay);
-        builder.OnUpdate<float>(positionY =>
+        var tween = context.CreateTween(() => source.Position.Y, () => target, duration, LerpFunctions.FloatLerp, autoPlay);
+        tween.SetOnUpdate(positionY =>
         {
             var localPosition = source.Position;
             localPosition.Y = positionY;
             source.Position = localPosition;
         });
-        return builder;
+        return tween;
     }
 
-    public static TweenBuilder RotateTo(this Node2D source, float target, float duration, TweenerContext context, bool autoPlay = true)
+    public static ITween RotateTo(this Node2D source, float target, float duration, TweenerContext context, bool autoPlay = true)
     {
-        var builder = context.Create(source.GlobalRotation, target, duration, LerpFunctions.FloatLerp, autoPlay);
-        builder.OnUpdate<float>(rotation => source.GlobalRotation = Mathf.DegToRad(rotation));
-        return builder;
+        var tween = context.CreateTween(() => source.GlobalRotation, () => target, duration, LerpFunctions.FloatLerp, autoPlay);
+        tween.SetOnUpdate(rotation => source.GlobalRotation = Mathf.DegToRad(rotation));
+        return tween;
     }
 
-    public static TweenBuilder RotateLocalTo(this Node2D source, float target, float duration, TweenerContext context, bool autoPlay = true)
+    public static ITween RotateLocalTo(this Node2D source, float target, float duration, TweenerContext context, bool autoPlay = true)
     {
-        var builder = context.Create(source.Rotation, target, duration, LerpFunctions.FloatLerp, autoPlay);
-        builder.OnUpdate<float>(rotation => source.Rotation = Mathf.DegToRad(rotation));
-        return builder;
+        var tween = context.CreateTween(() => source.Rotation, () => target, duration, LerpFunctions.FloatLerp, autoPlay);
+        tween.SetOnUpdate(rotation => source.Rotation = Mathf.DegToRad(rotation));
+        return tween;
     }
 
-    public static TweenBuilder ScaleTo(this Node2D source, Vector2 target, float duration, TweenerContext context, bool autoPlay = true)
+    public static ITween ScaleTo(this Node2D source, Vector2 target, float duration, TweenerContext context, bool autoPlay = true)
     {
-        var builder = context.Create(source.Scale, target, duration, LerpFunctions.Vector2Lerp, autoPlay);
-        builder.OnUpdate<Vector2>(scale => source.Scale = scale);
-        return builder;
+        var tween = context.CreateTween(() => source.Scale, () => target, duration, LerpFunctions.Vector2Lerp, autoPlay);
+        tween.SetOnUpdate(scale => source.Scale = scale);
+        return tween;
     }
 
-    public static TweenBuilder ScaleXTo(this Node2D source, float target, float duration, TweenerContext context, bool autoPlay = true)
+    public static ITween ScaleXTo(this Node2D source, float target, float duration, TweenerContext context, bool autoPlay = true)
     {
-        var builder = context.Create(source.Scale.X, target, duration, LerpFunctions.FloatLerp, autoPlay);
-        builder.OnUpdate<float>(scaleX =>
-        {
-            var scale = source.Scale;
-            scale.X = scaleX;
-            source.Scale = scale;
-        });
-        return builder;
+        var tween = context.CreateTween(() => source.Scale.X, () => target, duration, LerpFunctions.FloatLerp, autoPlay);
+        tween.SetOnUpdate(scaleX =>
+         {
+             var scale = source.Scale;
+             scale.X = scaleX;
+             source.Scale = scale;
+         });
+        return tween;
     }
 
-    public static TweenBuilder ScaleYTo(this Node2D source, float target, float duration, TweenerContext context, bool autoPlay = true)
+    public static ITween ScaleYTo(this Node2D source, float target, float duration, TweenerContext context, bool autoPlay = true)
     {
-        var builder = context.Create(source.Scale.Y, target, duration, LerpFunctions.FloatLerp, autoPlay);
-        builder.OnUpdate<float>(scaleY =>
+        var tween = context.CreateTween(() => source.Scale.Y, () => target, duration, LerpFunctions.FloatLerp, autoPlay);
+        tween.SetOnUpdate(scaleY =>
         {
             var scale = source.Scale;
             scale.Y = scaleY;
             source.Scale = scale;
         });
-        return builder;
+        return tween;
     }
 }
