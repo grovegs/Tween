@@ -71,19 +71,28 @@ internal class Tween<T> : ITween<T>
         }
     }
 
-    public void SetOnComplete(Action onComplete)
+    public ITween SetOnComplete(Action onComplete)
     {
         _onComplete += onComplete;
+        return this;
     }
 
-    public void SetOnUpdate(Action<T> onUpdate)
+    public ITween SetOnUpdate(Action<T> onUpdate)
     {
         _onUpdate += onUpdate;
+        return this;
     }
 
-    public void SetEase(EaseType easeType)
+    public ITween SetEase(EaseType easeType)
     {
         _easeType = easeType;
+        return this;
+    }
+
+    public ITween SetId(int id)
+    {
+        _id = id;
+        return this;
     }
 
     public void Pause()
@@ -107,11 +116,6 @@ internal class Tween<T> : ITween<T>
         _startValue = _startValueFunc();
         _endValue = _endValueFunc();
         _isPlaying = true;
-    }
-
-    public void SetId(int id)
-    {
-        _id = id;
     }
 
     public void Reset()

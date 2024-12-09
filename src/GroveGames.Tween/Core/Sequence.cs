@@ -72,14 +72,21 @@ internal class Sequence : ISequence
         _isPlaying = true;
     }
 
-    public void SetEase(EaseType easeType)
+    public ITween SetEase(EaseType easeType)
     {
         throw new ArgumentException("Sequences don't have easings");
     }
 
-    public void SetOnComplete(Action onComplete)
+    public ITween SetOnComplete(Action onComplete)
     {
         _onComplete += onComplete;
+        return this;
+    }
+
+    public ITween SetId(int id)
+    {
+        _id = id;
+        return this;
     }
 
     public void Stop(bool complete)
@@ -125,10 +132,5 @@ internal class Sequence : ISequence
         _elapsedTime = 0f;
         _isPlaying = true;
         _isRunning = true;
-    }
-
-    public void SetId(int id)
-    {
-        _id = id;
     }
 }
