@@ -184,4 +184,70 @@ public static class Node3DExtensions
         });
         return tween;
     }
+
+    public static ITween ShakePosition(
+    this Node3D source,
+    Vector3 strength,
+    float duration,
+    TweenerContext context,
+    int oscillations = 10,
+    bool autoPlay = true)
+    {
+        var originalPosition = source.GlobalPosition;
+        var tween = context.CreateTween(
+            () => 0f,
+            () => 1f,
+            duration,
+            LerpFunctions.FloatLerp,
+            autoPlay);
+
+        tween.SetOnUpdate(progress =>
+        {
+            float noiseX = Mathf.Sin(progress * Mathf.Pi * oscillations) * strength.X * (1f - progress);
+            float noiseY = Mathf.Sin(progress * Mathf.Pi * oscillations * 1.1f) * strength.Y * (1f - progress);
+            float noiseZ = Mathf.Sin(progress * Mathf.Pi * oscillations * 1.2f) * strength.Z * (1f - progress);
+
+            source.GlobalPosition = originalPosition + new Vector3(noiseX, noiseY, noiseZ);
+        });
+
+        tween.SetOnComplete(() =>
+        {
+            source.GlobalPosition = originalPosition;
+        });
+
+        return tween;
+    }
+
+    public static ITween ShakeRotation(
+        this Node3D source,
+        Vector3 strength,
+        float duration,
+        TweenerContext context,
+        int oscillations = 10,
+        bool autoPlay = true)
+    {
+        var originalRotation = source.RotationDegrees;
+        var tween = context.CreateTween(
+            () => 0f,
+            () => 1f,
+            duration,
+            LerpFunctions.FloatLerp,
+            autoPlay);
+
+        tween.SetOnUpdate(progress =>
+        {
+            float noiseX = Mathf.Sin(progress * Mathf.Pi * oscillations) * strength.X * (1f - progress);
+            float noiseY = Mathf.Sin(progress * Mathf.Pi * oscillations * 1.1f) * strength.Y * (1f - progress);
+            float noiseZ = Mathf.Sin(progress * Mathf.Pi * oscillations * 1.2f) * strength.Z * (1f - progress);
+
+            source.RotationDegrees = originalRotation + new Vector3(noiseX, noiseY, noiseZ);
+        });
+
+        tween.SetOnComplete(() =>
+        {
+            source.RotationDegrees = originalRotation;
+        });
+
+        return tween;
+    }
 }
