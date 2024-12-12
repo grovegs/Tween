@@ -250,4 +250,131 @@ public static class Node3DExtensions
 
         return tween;
     }
+
+    public static ITween ShakeScale(
+    this Node3D source,
+    Vector3 strength,
+    float duration,
+    TweenerContext context,
+    int oscillations = 10,
+    bool autoPlay = true)
+    {
+        var originalScale = source.Scale;
+        var tween = context.CreateTween(
+            () => 0f,
+            () => 1f,
+            duration,
+            LerpFunctions.FloatLerp,
+            autoPlay);
+
+        tween.SetOnUpdate(progress =>
+        {
+            float noiseX = Mathf.Sin(progress * Mathf.Pi * oscillations) * strength.X * (1f - progress);
+            float noiseY = Mathf.Sin(progress * Mathf.Pi * oscillations * 1.1f) * strength.Y * (1f - progress);
+            float noiseZ = Mathf.Sin(progress * Mathf.Pi * oscillations * 1.2f) * strength.Z * (1f - progress);
+
+            source.Scale = originalScale + new Vector3(noiseX, noiseY, noiseZ);
+        });
+
+        tween.SetOnComplete(() =>
+        {
+            source.Scale = originalScale;
+        });
+
+        return tween;
+    }
+
+
+    public static ITween PunchScale(
+        this Node3D source,
+        Vector3 punchStrength,
+        float duration,
+        TweenerContext context,
+        bool autoPlay = true)
+    {
+        var originalScale = source.Scale;
+
+        var tween = context.CreateTween(
+            () => 0f,
+            () => 1f,
+            duration,
+            LerpFunctions.FloatLerp,
+            autoPlay);
+
+        tween.SetOnUpdate(progress =>
+        {
+            float easeOutElastic = Mathf.Pow(2, -10 * progress) * Mathf.Sin((progress - 0.075f) * (2 * Mathf.Pi) / 0.3f) + 1;
+
+            source.Scale = originalScale + punchStrength * easeOutElastic;
+        });
+
+        tween.SetOnComplete(() =>
+        {
+            source.Scale = originalScale;
+        });
+
+        return tween;
+    }
+
+    public static ITween PunchPosition(
+    this Node3D source,
+    Vector3 punchStrength,
+    float duration,
+    TweenerContext context,
+    bool autoPlay = true)
+    {
+        var originalPosition = source.GlobalPosition;
+
+        var tween = context.CreateTween(
+            () => 0f,
+            () => 1f,
+            duration,
+            LerpFunctions.FloatLerp,
+            autoPlay);
+
+        tween.SetOnUpdate(progress =>
+        {
+            float easeOutElastic = Mathf.Pow(2, -10 * progress) * Mathf.Sin((progress - 0.075f) * (2 * Mathf.Pi) / 0.3f) + 1;
+
+            source.GlobalPosition = originalPosition + punchStrength * easeOutElastic;
+        });
+
+        tween.SetOnComplete(() =>
+        {
+            source.GlobalPosition = originalPosition;
+        });
+
+        return tween;
+    }
+
+    public static ITween PunchRotation(
+        this Node3D source,
+        Vector3 punchStrength,
+        float duration,
+        TweenerContext context,
+        bool autoPlay = true)
+    {
+        var originalRotation = source.RotationDegrees;
+
+        var tween = context.CreateTween(
+            () => 0f,
+            () => 1f,
+            duration,
+            LerpFunctions.FloatLerp,
+            autoPlay);
+
+        tween.SetOnUpdate(progress =>
+        {
+            float easeOutElastic = Mathf.Pow(2, -10 * progress) * Mathf.Sin((progress - 0.075f) * (2 * Mathf.Pi) / 0.3f) + 1;
+
+            source.RotationDegrees = originalRotation + punchStrength * easeOutElastic;
+        });
+
+        tween.SetOnComplete(() =>
+        {
+            source.RotationDegrees = originalRotation;
+        });
+
+        return tween;
+    }
 }
