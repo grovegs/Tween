@@ -16,8 +16,6 @@ public partial class TestSceneController : Node3D
 		_context = new TweenerContext();
 		var sequence = _context.CreateSequnce();
 
-		var moveUpTween = _cube.MoveLocalYTo(_cube.GlobalPosition.Y + 0.5f, 2f, _context);
-
 		var moveRightTween = _cube.MoveXTo(_cube.GlobalPosition.X + 2f, 3f, _context);
 		moveRightTween.SetOnComplete(() => GD.Print("First Tween is Completed"));
 		moveRightTween.SetEase(EaseType.InBack);
@@ -30,7 +28,10 @@ public partial class TestSceneController : Node3D
 		var scaleTween = _cube.ScaleTo(Vector3.One, 1f, _context);
 		scaleTween.SetEase(EaseType.OutBack);
 
+		var shakeTween = _cube.ShakePosition(Vector3.One * 0.1f, 0.25f, _context, 10);
+
 		sequence
+		.Then(shakeTween)
 		.Then(moveRightTween)
 		.With(rotateTween)
 		.Wait(1f)
