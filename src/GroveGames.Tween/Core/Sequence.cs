@@ -77,6 +77,16 @@ internal class Sequence : ISequence
         throw new ArgumentException("Sequences don't have easings");
     }
 
+    public ITween SetLoopType(LoopType loopType)
+    {
+        throw new ArgumentException("Sequences don't have loops");
+    }
+
+    public ITween SetLoopCount(int loopCount)
+    {
+        throw new ArgumentException("Sequences don't have loops");
+    }
+
     public ITween SetOnComplete(Action onComplete)
     {
         _onComplete += onComplete;

@@ -12,8 +12,11 @@ internal class Tween<T> : ITween<T>
     public int Id => _id;
 
     private readonly float _duration;
+
     private float _elapsedTime;
     private int _id;
+    private int _loopCount;
+    private int _currentLoop;
 
     private bool _isRunning;
     private bool _isPlaying;
@@ -24,6 +27,7 @@ internal class Tween<T> : ITween<T>
     private Func<T, T, float, T> _lerpFunction;
     private Func<T> _startValueFunc;
     private Func<T> _endValueFunc;
+    private LoopType _loopType;
 
     private Action _onComplete;
     private Action<T> _onUpdate;
@@ -37,6 +41,11 @@ internal class Tween<T> : ITween<T>
         _duration = duration;
         _lerpFunction = lerpFunc;
         _isRunning = true;
+        _loopType = LoopType.None;
+        _elapsedTime = 0f;
+        _id = -1;
+        _loopCount = 0;
+        _currentLoop = 0;
 
         if (autoStart)
         {
@@ -55,8 +64,7 @@ internal class Tween<T> : ITween<T>
 
         if (_elapsedTime >= _duration)
         {
-            _elapsedTime = _duration;
-            _isRunning = false;
+            ApplyLoop();
         }
 
         var t = Math.Clamp(_elapsedTime / _duration, 0f, 1f);
@@ -95,6 +103,18 @@ internal class Tween<T> : ITween<T>
         return this;
     }
 
+    public ITween SetLoopType(LoopType loopType)
+    {
+        _loopType = loopType;
+        return this;
+    }
+
+    public ITween SetLoopCount(int loopCount)
+    {
+        _loopCount = loopCount;
+        return this;
+    }
+
     public void Pause()
     {
         _isPlaying = false;
@@ -122,6 +142,8 @@ internal class Tween<T> : ITween<T>
     {
         _id = -1;
         _elapsedTime = 0f;
+        _loopCount = 0;
+        _currentLoop = 0;
         _isPlaying = true;
         _isRunning = true;
         _onComplete = null;
@@ -130,5 +152,38 @@ internal class Tween<T> : ITween<T>
         _lerpFunction = null;
         _startValueFunc = null;
         _easeType = EaseType.Linear;
+        _loopType = LoopType.None;
+    }
+
+    private void ApplyLoop()
+    {
+        if (_loopType == LoopType.None)
+        {
+            _elapsedTime = _duration;
+            _isRunning = false;
+            return;
+        }
+
+        if (_loopCount == -1 || _currentLoop < _loopCount)
+        {
+            if (_loopType == LoopType.Restart)
+            {
+                _elapsedTime = 0f;
+            }
+            else if (_loopType == LoopType.Yoyo)
+            {
+                _elapsedTime = 0f;
+                (_endValueFunc, _startValueFunc) = (_startValueFunc, _endValueFunc);
+                _startValue = _startValueFunc();
+                _endValue = _endValueFunc();
+            }
+
+            _currentLoop++;
+        }
+        else
+        {
+            _elapsedTime = _duration;
+            _isRunning = false;
+        }
     }
 }
