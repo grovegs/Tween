@@ -103,14 +103,9 @@ internal class Tween<T> : ITween<T>
         return this;
     }
 
-    public ITween SetLoopType(LoopType loopType)
+    public ITween SetLoops(LoopType loopType, int loopCount)
     {
         _loopType = loopType;
-        return this;
-    }
-
-    public ITween SetLoopCount(int loopCount)
-    {
         _loopCount = loopCount;
         return this;
     }

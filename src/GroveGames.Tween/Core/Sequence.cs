@@ -77,12 +77,7 @@ internal class Sequence : ISequence
         throw new ArgumentException("Sequences don't have easings");
     }
 
-    public ITween SetLoopType(LoopType loopType)
-    {
-        throw new ArgumentException("Sequences don't have loops");
-    }
-
-    public ITween SetLoopCount(int loopCount)
+    public ITween SetLoops(LoopType loopType, int loopCount)
     {
         throw new ArgumentException("Sequences don't have loops");
     }
