@@ -42,8 +42,8 @@ public partial class TestSceneController : Node3D
 		.Callback(() => GD.Print("Callback 2 invoke"))
 		.Then(moveLeftTween)
 		.Then(scaleTween)
-		.Then(_cube.RotateYTo(360, 2f, _context).SetLoopType(LoopType.Yoyo).SetLoopCount(3))
-		.Then(_cube.RotateYTo(360, 2f, _context).SetLoopType(LoopType.Restart).SetLoopCount(-1))
+		.Then(_cube.RotateYTo(360, 2f, _context).SetLoops(LoopType.Yoyo, 3))
+		.Then(_cube.RotateYTo(360, 2f, _context).SetLoops(LoopType.Restart, -1))
 		.SetOnComplete(() => GD.Print("Sequence is Completed"));
 	}
 
