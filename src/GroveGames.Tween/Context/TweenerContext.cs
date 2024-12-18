@@ -46,11 +46,11 @@ public class TweenerContext
 
     public ISequence CreateSequnce()
     {
-        var sequence = _tweenPool.GetTween<ISequence>();
+        var sequence = _tweenPool.GetSequence();
         sequence.SetOnComplete(() => _stoppedTweens.Add(sequence));
         _tweens.Add(sequence);
 
-        return (ISequence)sequence;
+        return sequence;
     }
 
     public void Update(float deltaTime)
