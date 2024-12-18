@@ -2,7 +2,7 @@ using GroveGames.Tween.Easing;
 
 namespace GroveGames.Tween.Core;
 
-internal class Tween<T> : ITween<T>
+public class Tween<T> : ITween<T>
 {
     public bool IsRunning => _isRunning;
     public bool IsPlaying => _isPlaying;
@@ -35,7 +35,7 @@ internal class Tween<T> : ITween<T>
 
     private EaseType _easeType;
 
-    internal Tween() { }
+    public Tween() { }
 
     internal void Construct(Func<T> start, Func<T> end, float duration, Func<T, T, float, T> lerpFunc, bool autoStart)
     {

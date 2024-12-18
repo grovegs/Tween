@@ -1,5 +1,6 @@
 using GroveGames.Tween.Context;
 using GroveGames.Tween.Core;
+using GroveGames.Tween.Pooling;
 
 using Xunit;
 
@@ -12,6 +13,7 @@ public class TweenerContextTests
     {
         // Arrange
         var context = new TweenerContext();
+        context.AddPoolStrategy<ITween<float>>(new FloatTweenPooledObjectStrategy());
 
         // Act
         var tween1 = context.CreateTween(
@@ -42,6 +44,7 @@ public class TweenerContextTests
     {
         // Arrange
         var context = new TweenerContext();
+        context.AddPoolStrategy<ITween<float>>(new FloatTweenPooledObjectStrategy());
 
         // Act
         var tween1 = context.CreateTween(
@@ -69,6 +72,7 @@ public class TweenerContextTests
     {
         // Arrange
         var context = new TweenerContext();
+        context.AddPoolStrategy<ITween<float>>(new FloatTweenPooledObjectStrategy());
 
         var tween = context.CreateTween(
             () => 0f,
@@ -91,6 +95,7 @@ public class TweenerContextTests
     {
         // Arrange
         var context = new TweenerContext();
+        context.AddPoolStrategy<ITween<float>>(new FloatTweenPooledObjectStrategy());
 
         var tween1 = context.CreateTween(
             () => 0f,
@@ -124,6 +129,7 @@ public class TweenerContextTests
     {
         // Arrange
         var context = new TweenerContext();
+        context.AddPoolStrategy<ITween<float>>(new FloatTweenPooledObjectStrategy());
 
         var tween = context.CreateTween(
             () => 0f,
@@ -145,6 +151,7 @@ public class TweenerContextTests
     {
         // Arrange
         var context = new TweenerContext();
+        context.AddPoolStrategy<ITween<float>>(new FloatTweenPooledObjectStrategy());
 
         var tween = context.CreateTween(
             () => 0f,
