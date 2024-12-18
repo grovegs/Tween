@@ -18,7 +18,7 @@ public class TweenerContext
 
     public ITween<T> CreateTween<T>(Func<T> start, Func<T> end, float duration, Func<T, T, float, T> lerpFunc, bool autoPlay)
     {
-        var tween = _tweenPool.Get<T>();
+        var tween = _tweenPool.GetTween<T>();
         var tweenInstance = (Tween<T>)tween;
         tweenInstance.Construct(start, end, duration, lerpFunc, autoPlay);
         tween.SetOnComplete(() => _stoppedTweens.Add(tween));
@@ -46,7 +46,7 @@ public class TweenerContext
 
     public ISequence CreateSequnce()
     {
-        var sequence = _tweenPool.Get<ISequence>();
+        var sequence = _tweenPool.GetTween<ISequence>();
         sequence.SetOnComplete(() => _stoppedTweens.Add(sequence));
         _tweens.Add(sequence);
 

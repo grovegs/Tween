@@ -4,16 +4,16 @@ namespace GroveGames.Tween.Pooling;
 
 public class TweenPool
 {
-    private readonly Dictionary<Type, Stack<ITween>> _pool;
+    private readonly Dictionary<Type, Stack<ITween>> _tweenPool;
 
     public TweenPool()
     {
-        _pool = [];
+        _tweenPool = [];
     }
 
-    public ITween Get<T>()
+    public ITween GetTween<T>()
     {
-        if (_pool.TryGetValue(typeof(T), out var stack))
+        if (_tweenPool.TryGetValue(typeof(T), out var stack))
         {
             if (stack.Count > 0)
             {
@@ -29,7 +29,7 @@ public class TweenPool
         }
 
         var newStack = new Stack<ITween>();
-        _pool[typeof(T)] = newStack;
+        _tweenPool[typeof(T)] = newStack;
         var tween = new Tween<T>();
         tween.SetOnStop(() => Return<T>(tween));
         return tween;
@@ -38,6 +38,6 @@ public class TweenPool
     private void Return<T>(ITween tween)
     {
         tween.Reset();
-        _pool[typeof(T)].Push(tween);
+        _tweenPool[typeof(T)].Push(tween);
     }
 }
