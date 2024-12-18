@@ -6,6 +6,8 @@ public interface ITween
 {
     ITween SetEase(EaseType easeType);
     ITween SetOnComplete(Action onComplete);
+    ITween SetOnStop(Action onStop);
+
     ITween SetId(int id);
     ITween SetLoops(LoopType loopType, int loopCount);
     void Stop(bool complete);

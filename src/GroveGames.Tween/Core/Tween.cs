@@ -11,9 +11,9 @@ internal class Tween<T> : ITween<T>
 
     public int Id => _id;
 
-    private readonly float _duration;
-
+    private float _duration;
     private float _elapsedTime;
+
     private int _id;
     private int _loopCount;
     private int _currentLoop;
@@ -30,11 +30,14 @@ internal class Tween<T> : ITween<T>
     private LoopType _loopType;
 
     private Action _onComplete;
+    private Action _onStop;
     private Action<T> _onUpdate;
 
     private EaseType _easeType;
 
-    internal Tween(Func<T> start, Func<T> end, float duration, Func<T, T, float, T> lerpFunc, bool autoStart)
+    internal Tween() { }
+
+    internal void Construct(Func<T> start, Func<T> end, float duration, Func<T, T, float, T> lerpFunc, bool autoStart)
     {
         _startValueFunc = start;
         _endValueFunc = end;
@@ -110,6 +113,12 @@ internal class Tween<T> : ITween<T>
         return this;
     }
 
+    public ITween SetOnStop(Action onStop)
+    {
+        _onStop += onStop;
+        return this;
+    }
+
     public void Pause()
     {
         _isPlaying = false;
@@ -124,6 +133,8 @@ internal class Tween<T> : ITween<T>
             _onUpdate?.Invoke(_endValue);
             _onComplete?.Invoke();
         }
+
+        _onStop?.Invoke();
     }
 
     public void Play()
@@ -139,13 +150,14 @@ internal class Tween<T> : ITween<T>
         _elapsedTime = 0f;
         _loopCount = 0;
         _currentLoop = 0;
-        _isPlaying = true;
-        _isRunning = true;
+        _isPlaying = false;
+        _isRunning = false;
         _onComplete = null;
         _onUpdate = null;
         _endValueFunc = null;
         _lerpFunction = null;
         _startValueFunc = null;
+        _onStop = null;
         _easeType = EaseType.Linear;
         _loopType = LoopType.None;
     }

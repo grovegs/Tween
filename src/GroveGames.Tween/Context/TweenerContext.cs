@@ -1,4 +1,5 @@
 using GroveGames.Tween.Core;
+using GroveGames.Tween.Pooling;
 
 namespace GroveGames.Tween.Context;
 
@@ -6,20 +7,24 @@ public class TweenerContext
 {
     private readonly List<ITween> _tweens;
     private readonly HashSet<ITween> _stoppedTweens;
+    private readonly TweenPool _tweenPool;
 
     public TweenerContext()
     {
         _tweens = [];
         _stoppedTweens = [];
+        _tweenPool = new TweenPool();
     }
 
     public ITween<T> CreateTween<T>(Func<T> start, Func<T> end, float duration, Func<T, T, float, T> lerpFunc, bool autoPlay)
     {
-        ITween<T> tween = new Tween<T>(start, end, duration, lerpFunc: lerpFunc, autoPlay);
+        var tween = _tweenPool.Get<T>();
+        var tweenInstance = (Tween<T>)tween;
+        tweenInstance.Construct(start, end, duration, lerpFunc, autoPlay);
         tween.SetOnComplete(() => _stoppedTweens.Add(tween));
         _tweens.Add(tween);
 
-        return tween;
+        return tweenInstance;
     }
 
     public void Stop(ITween tween)
@@ -41,11 +46,11 @@ public class TweenerContext
 
     public ISequence CreateSequnce()
     {
-        ISequence sequence = new Sequence();
+        var sequence = _tweenPool.Get<ISequence>();
         sequence.SetOnComplete(() => _stoppedTweens.Add(sequence));
         _tweens.Add(sequence);
 
-        return sequence;
+        return (ISequence)sequence;
     }
 
     public void Update(float deltaTime)

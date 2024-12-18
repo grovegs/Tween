@@ -1,5 +1,2 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
-  <ItemGroup>
-    <PackageReference Include="GroveGames.ObjectPool" Version="0.0.1" />
-  </ItemGroup>
 </Project>

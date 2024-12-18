@@ -21,6 +21,7 @@ internal class Sequence : ISequence
     private int _id;
 
     private Action _onComplete;
+    private Action _onStop;
 
     internal Sequence()
     {
@@ -88,6 +89,12 @@ internal class Sequence : ISequence
         return this;
     }
 
+    public ITween SetOnStop(Action onStop)
+    {
+        _onStop += onStop;
+        return this;
+    }
+
     public ITween SetId(int id)
     {
         _id = id;
@@ -133,9 +140,10 @@ internal class Sequence : ISequence
         _sequenceExecutables.Clear();
         _id = -1;
         _onComplete = null;
+        _onStop = null;
         _duration = 0f;
         _elapsedTime = 0f;
-        _isPlaying = true;
-        _isRunning = true;
+        _isPlaying = false;
+        _isRunning = false;
     }
 }

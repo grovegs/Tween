@@ -13,13 +13,14 @@ public class TweenTests
         var duration = 2f;
 
         var onUpdateMock = new Mock<Action<float>>();
-        var tween = new Tween<float>(
-            () => startValue,
-            () => endValue,
-            duration,
-            (start, end, t) => start + (end - start) * t,
-            autoStart: true
-        );
+        var tween = new Tween<float>();
+        tween.Construct(
+           () => startValue,
+           () => endValue,
+           duration,
+           (start, end, t) => start + (end - start) * t,
+           autoStart: true
+       );
         tween.SetOnUpdate(onUpdateMock.Object);
 
         // Act
@@ -38,7 +39,8 @@ public class TweenTests
         var duration = 1f;
 
         var onCompleteMock = new Mock<Action>();
-        var tween = new Tween<float>(
+        var tween = new Tween<float>();
+        tween.Construct(
             () => startValue,
             () => endValue,
             duration,
@@ -63,7 +65,8 @@ public class TweenTests
         var duration = 2f;
 
         var onUpdateMock = new Mock<Action<float>>();
-        var tween = new Tween<float>(
+        var tween = new Tween<float>();
+        tween.Construct(
             () => startValue,
             () => endValue,
             duration,
