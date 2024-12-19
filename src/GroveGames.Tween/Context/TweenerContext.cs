@@ -1,4 +1,7 @@
+using GroveGames.ObjectPool;
+using GroveGames.ObjectPool.Pools;
 using GroveGames.Tween.Core;
+using GroveGames.Tween.Pooling;
 
 namespace GroveGames.Tween.Context;
 
@@ -7,19 +10,42 @@ public class TweenerContext
     private readonly List<ITween> _tweens;
     private readonly HashSet<ITween> _stoppedTweens;
 
+    private readonly IMultiTypeObjectPool<ITween> _multiTypeObjectPool;
+    private readonly IObjectPool<ISequence> _sequencePool;
+
     public TweenerContext()
     {
         _tweens = [];
         _stoppedTweens = [];
+        _multiTypeObjectPool = new MultiTypeObjectPool<ITween>();
+        _sequencePool = new ObjectPool<ISequence>(10, new SequencePooledObjectStrategy());
+    }
+
+    public void AddPoolStrategy<T>(IPooledObjectStrategy<ITween> strategy) where T : class, ITween
+    {
+        _multiTypeObjectPool.AddPooledObjectStrategy<T>(strategy);
     }
 
     public ITween<T> CreateTween<T>(Func<T> start, Func<T> end, float duration, Func<T, T, float, T> lerpFunc, bool autoPlay)
     {
-        ITween<T> tween = new Tween<T>(start, end, duration, lerpFunc: lerpFunc, autoPlay);
+        var tween = _multiTypeObjectPool.Get<ITween<T>>();
+        var tweenInstance = (Tween<T>)tween;
+        tweenInstance.Construct(start, end, duration, lerpFunc, autoPlay);
+        tween.SetOnStop(() => _multiTypeObjectPool.Return(tween));
         tween.SetOnComplete(() => _stoppedTweens.Add(tween));
         _tweens.Add(tween);
 
-        return tween;
+        return tweenInstance;
+    }
+
+    public ISequence CreateSequnce()
+    {
+        var sequence = _sequencePool.Get();
+        sequence.SetOnComplete(() => _stoppedTweens.Add(sequence));
+        sequence.SetOnStop(() => _sequencePool.Return(sequence));
+        _tweens.Add(sequence);
+
+        return sequence;
     }
 
     public void Stop(ITween tween)
@@ -37,15 +63,6 @@ public class TweenerContext
                 break;
             }
         }
-    }
-
-    public ISequence CreateSequnce()
-    {
-        ISequence sequence = new Sequence();
-        sequence.SetOnComplete(() => _stoppedTweens.Add(sequence));
-        _tweens.Add(sequence);
-
-        return sequence;
     }
 
     public void Update(float deltaTime)

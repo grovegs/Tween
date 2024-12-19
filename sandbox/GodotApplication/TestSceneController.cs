@@ -1,8 +1,10 @@
 using Godot;
 
+using GroveGames.Tween;
 using GroveGames.Tween.Context;
 using GroveGames.Tween.Core;
 using GroveGames.Tween.Easing;
+using GroveGames.Tween.Pooling;
 using GroveGames.Tween.TweenExtensions;
 
 using System;
@@ -15,6 +17,9 @@ public partial class TestSceneController : Node3D
 	public override void _Ready()
 	{
 		_context = new TweenerContext();
+		_context.AddPoolStrategy<ITween<float>>(new FloatTweenPooledObjectStrategy());
+		_context.AddPoolStrategy<ITween<Vector3>>(new Vector3PooledObjectStrategy());
+
 		var sequence = _context.CreateSequnce();
 
 		var moveRightTween = _cube.MoveXTo(_cube.GlobalPosition.X + 2f, 3f, _context);
