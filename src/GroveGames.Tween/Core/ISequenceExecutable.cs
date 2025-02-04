@@ -3,7 +3,9 @@ namespace GroveGames.Tween.Core;
 internal interface ISequenceExecutable
 {
     void Execute();
+    void Stop();
     float ExecutionTime { get; }
-    void Reset();
+    bool IsRunning { get; }
+    bool IsPlaying { get; }
 }
 

@@ -87,4 +87,62 @@ public class SequenceTests
 
         mockTween4.Verify(t => t.Play(), Times.Never);
     }
+
+    [Fact]
+    public void Sequence_Stop_Stops_Tweens()
+    {
+        // Arrange
+        var onStopMock = new Mock<Action>();
+        var onStopMock2 = new Mock<Action>();
+        var onStopMock3 = new Mock<Action>();
+
+        var startValue = 0f;
+        var endValue = 10f;
+        var duration = 1f;
+
+        var tween1 = new Tween<float>();
+        tween1.Construct(
+            () => startValue,
+            () => endValue,
+            duration,
+            (start, end, t) => start + (end - start) * t,
+            autoStart: false
+        );
+        tween1.SetOnStop(onStopMock.Object);
+
+        var tween2 = new Tween<float>();
+        tween2.Construct(
+            () => startValue,
+            () => endValue,
+            duration,
+            (start, end, t) => start + (end - start) * t,
+            autoStart: false
+        );
+        tween2.SetOnStop(onStopMock2.Object);
+
+        var tween3 = new Tween<float>();
+        tween3.Construct(
+            () => startValue,
+            () => endValue,
+            duration,
+            (start, end, t) => start + (end - start) * t,
+            autoStart: false
+        );
+        tween3.SetOnStop(onStopMock3.Object);
+
+        var sequence = new Sequence();
+        sequence
+        .Then(tween1)
+        .Then(tween2)
+        .With(tween3);
+
+        // Act
+        sequence.Update(1.1f);
+        tween1.Update(1.1f);
+        sequence.Stop();
+
+        onStopMock.Verify(stop => stop.Invoke(), Times.Never);
+        onStopMock2.Verify(stop => stop.Invoke(), Times.Once);
+        onStopMock3.Verify(stop => stop.Invoke(), Times.Once);
+    }
 }

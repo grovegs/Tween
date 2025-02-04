@@ -4,8 +4,12 @@ internal class ActionSequenceExecutable : ISequenceExecutable
 {
     public float ExecutionTime => _executionTime;
 
-    private float _executionTime;
-    private Action _action;
+    public bool IsRunning => false;
+
+    public bool IsPlaying => false;
+
+    private readonly float _executionTime;
+    private readonly Action _action;
 
     public ActionSequenceExecutable(Action action, float executionTime)
     {
@@ -18,10 +22,9 @@ internal class ActionSequenceExecutable : ISequenceExecutable
         _action?.Invoke();
     }
 
-    public void Reset()
+    public void Stop()
     {
-        _action = null;
-        _executionTime = 0f;
+
     }
 }
 

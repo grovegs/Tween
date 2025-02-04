@@ -9,6 +9,7 @@ public class TweenerContext
 {
     private readonly List<ITween> _tweens;
     private readonly HashSet<ITween> _stoppedTweens;
+    private readonly HashSet<ITween> _completedTweens;
 
     private readonly IMultiTypeObjectPool<ITween> _multiTypeObjectPool;
     private readonly IObjectPool<ISequence> _sequencePool;
@@ -17,6 +18,7 @@ public class TweenerContext
     {
         _tweens = [];
         _stoppedTweens = [];
+        _completedTweens = [];
         _multiTypeObjectPool = new MultiTypeObjectPool<ITween>();
         _sequencePool = new ObjectPool<ISequence>(10, new SequencePooledObjectStrategy());
     }
@@ -32,7 +34,7 @@ public class TweenerContext
         var tweenInstance = (Tween<T>)tween;
         tweenInstance.Construct(start, end, duration, lerpFunc, autoPlay);
         tween.SetOnStop(() => _multiTypeObjectPool.Return(tween));
-        tween.SetOnComplete(() => _stoppedTweens.Add(tween));
+        tween.SetOnComplete(() => _completedTweens.Add(tween));
         _tweens.Add(tween);
 
         return tweenInstance;
@@ -41,7 +43,7 @@ public class TweenerContext
     public ISequence CreateSequnce()
     {
         var sequence = _sequencePool.Get();
-        sequence.SetOnComplete(() => _stoppedTweens.Add(sequence));
+        sequence.SetOnComplete(() => _completedTweens.Add(sequence));
         sequence.SetOnStop(() => _sequencePool.Return(sequence));
         _tweens.Add(sequence);
 
@@ -73,15 +75,17 @@ public class TweenerContext
 
             if (_stoppedTweens.Contains(tween))
             {
-                _stoppedTweens.Remove(tween);
                 _tweens.RemoveAt(i);
-                tween.Stop(false);
+                _stoppedTweens.Remove(tween);
+                tween.Stop();
                 continue;
             }
 
-            if (!tween.IsRunning)
+            if (_completedTweens.Contains(tween))
             {
-                _stoppedTweens.Add(tween);
+                _tweens.RemoveAt(i);
+                _multiTypeObjectPool.Return(tween);
+                _completedTweens.Remove(tween);
                 continue;
             }
 

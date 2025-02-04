@@ -101,9 +101,19 @@ internal class Sequence : ISequence
         return this;
     }
 
-    public void Stop(bool complete)
+    public void Stop()
     {
         _isRunning = false;
+
+        foreach (var executable in _sequenceExecutables)
+        {
+            if (executable.IsRunning)
+            {
+                executable.Stop();
+            }
+        }
+
+        _onStop?.Invoke();
     }
 
     public void Update(float deltaTime)
@@ -122,10 +132,9 @@ internal class Sequence : ISequence
         for (var i = _sequenceExecutables.Count - 1; i >= 0; i--)
         {
             var currentElement = _sequenceExecutables[i];
-            if (_elapsedTime >= currentElement.ExecutionTime)
+            if (_elapsedTime >= currentElement.ExecutionTime && !currentElement.IsPlaying)
             {
                 currentElement.Execute();
-                _sequenceExecutables.RemoveAt(i);
             }
         }
 
