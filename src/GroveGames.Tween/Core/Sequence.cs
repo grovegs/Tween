@@ -33,7 +33,6 @@ internal class Sequence : ISequence
     public ISequence Then(ITween tween)
     {
         tween.Pause();
-
         _lastAppendDuration = tween.Duration;
         var element = new TweenSequenceExecetable(tween, _duration);
         _duration += tween.Duration;
