@@ -24,7 +24,7 @@ public class TweenerContextTests
             autoPlay: true
         );
 
-        context.Stop(tween1);
+        tween1.Stop();
         context.Update(0f);
 
         var tween2 = context.CreateTween(
@@ -83,7 +83,7 @@ public class TweenerContextTests
         );
 
         // Act
-        context.Stop(tween);
+        tween.Stop();
         context.Update(0f);
 
         // Assert
@@ -161,7 +161,7 @@ public class TweenerContextTests
             autoPlay: true
         );
 
-        context.Stop(tween);
+        tween.Stop();
 
         // Act
         context.Update(0.1f);

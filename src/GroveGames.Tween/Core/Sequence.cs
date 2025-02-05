@@ -5,6 +5,7 @@ namespace GroveGames.Tween.Core;
 internal class Sequence : ISequence
 {
     private readonly List<ISequenceExecutable> _sequenceExecutables;
+    private readonly HashSet<ISequenceExecutable> _completedExecutables;
 
     private float _elapsedTime;
     private float _duration;
@@ -26,6 +27,7 @@ internal class Sequence : ISequence
     internal Sequence()
     {
         _sequenceExecutables = [];
+        _completedExecutables = [];
         _isRunning = true;
         _isPlaying = true;
     }
@@ -33,9 +35,9 @@ internal class Sequence : ISequence
     public ISequence Then(ITween tween)
     {
         tween.Pause();
-
         _lastAppendDuration = tween.Duration;
-        var element = new TweenSequenceExecetable(tween, _duration);
+        var element = new TweenSequenceExecutable(tween, _duration);
+        element.OnComplete(() => _completedExecutables.Add(element));
         _duration += tween.Duration;
         _sequenceExecutables.Add(element);
         return this;
@@ -44,7 +46,8 @@ internal class Sequence : ISequence
     public ISequence With(ITween tween)
     {
         tween.Pause();
-        var element = new TweenSequenceExecetable(tween, _duration - _lastAppendDuration);
+        var element = new TweenSequenceExecutable(tween, _duration - _lastAppendDuration);
+        element.OnComplete(() => _completedExecutables.Add(element));
         _sequenceExecutables.Add(element);
         return this;
     }
@@ -52,6 +55,7 @@ internal class Sequence : ISequence
     public ISequence Callback(Action callback)
     {
         var element = new ActionSequenceExecutable(callback, _duration);
+        element.OnComplete(() => _completedExecutables.Add(element));
         _sequenceExecutables.Add(element);
         return this;
     }
@@ -101,9 +105,19 @@ internal class Sequence : ISequence
         return this;
     }
 
-    public void Stop(bool complete)
+    public void Stop()
     {
         _isRunning = false;
+
+        foreach (var executable in _sequenceExecutables)
+        {
+            if (executable.IsRunning)
+            {
+                executable.Stop();
+            }
+        }
+
+        _onStop?.Invoke();
     }
 
     public void Update(float deltaTime)
@@ -122,10 +136,17 @@ internal class Sequence : ISequence
         for (var i = _sequenceExecutables.Count - 1; i >= 0; i--)
         {
             var currentElement = _sequenceExecutables[i];
-            if (_elapsedTime >= currentElement.ExecutionTime)
+
+            if (_completedExecutables.Contains(currentElement))
+            {
+                _sequenceExecutables.RemoveAt(i);
+                _completedExecutables.Remove(currentElement);
+                continue;
+            }
+
+            if (_elapsedTime >= currentElement.ExecutionTime && !currentElement.IsPlaying)
             {
                 currentElement.Execute();
-                _sequenceExecutables.RemoveAt(i);
             }
         }
 

@@ -76,7 +76,7 @@ public class TweenTests
         tween.SetOnUpdate(onUpdateMock.Object);
 
         // Act
-        tween.Stop(false);
+        tween.Stop();
         tween.Update(1f);
 
         // Assert

@@ -10,7 +10,7 @@ public interface ITween
 
     ITween SetId(int id);
     ITween SetLoops(LoopType loopType, int loopCount);
-    void Stop(bool complete);
+    void Stop();
     void Update(float deltaTime);
     void Pause();
     void Play();

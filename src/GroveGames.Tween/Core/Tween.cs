@@ -124,16 +124,9 @@ public class Tween<T> : ITween<T>
         _isPlaying = false;
     }
 
-    public void Stop(bool complete)
+    public void Stop()
     {
         _isRunning = false;
-
-        if (complete)
-        {
-            _onUpdate?.Invoke(_endValue);
-            _onComplete?.Invoke();
-        }
-
         _onStop?.Invoke();
     }
 

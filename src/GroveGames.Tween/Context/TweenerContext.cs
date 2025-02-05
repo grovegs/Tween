@@ -31,26 +31,33 @@ public class TweenerContext
         var tween = _multiTypeObjectPool.Get<ITween<T>>();
         var tweenInstance = (Tween<T>)tween;
         tweenInstance.Construct(start, end, duration, lerpFunc, autoPlay);
-        tween.SetOnStop(() => _multiTypeObjectPool.Return(tween));
-        tween.SetOnComplete(() => _stoppedTweens.Add(tween));
+        tween.SetOnStop(OnCompleteOrStop);
+        tween.SetOnComplete(OnCompleteOrStop);
         _tweens.Add(tween);
 
         return tweenInstance;
+
+        void OnCompleteOrStop()
+        {
+            _stoppedTweens.Add(tween);
+            _multiTypeObjectPool.Return(tween);
+        }
     }
 
     public ISequence CreateSequnce()
     {
         var sequence = _sequencePool.Get();
-        sequence.SetOnComplete(() => _stoppedTweens.Add(sequence));
-        sequence.SetOnStop(() => _sequencePool.Return(sequence));
+        sequence.SetOnComplete(OnCompleteOrStop);
+        sequence.SetOnStop(OnCompleteOrStop);
         _tweens.Add(sequence);
 
         return sequence;
-    }
 
-    public void Stop(ITween tween)
-    {
-        _stoppedTweens.Add(tween);
+        void OnCompleteOrStop()
+        {
+            _stoppedTweens.Add(sequence);
+            _sequencePool.Return(sequence);
+        }
     }
 
     public void Stop(int id)
@@ -59,7 +66,7 @@ public class TweenerContext
         {
             if (tween.Id == id)
             {
-                Stop(tween);
+                tween.Stop();
                 break;
             }
         }
@@ -73,15 +80,8 @@ public class TweenerContext
 
             if (_stoppedTweens.Contains(tween))
             {
-                _stoppedTweens.Remove(tween);
                 _tweens.RemoveAt(i);
-                tween.Stop(false);
-                continue;
-            }
-
-            if (!tween.IsRunning)
-            {
-                _stoppedTweens.Add(tween);
+                _stoppedTweens.Remove(tween);
                 continue;
             }
 
