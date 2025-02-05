@@ -36,7 +36,7 @@ internal class Sequence : ISequence
     {
         tween.Pause();
         _lastAppendDuration = tween.Duration;
-        var element = new TweenSequenceExecetable(tween, _duration);
+        var element = new TweenSequenceExecutable(tween, _duration);
         element.OnComplete(() => _completedExecutables.Add(element));
         _duration += tween.Duration;
         _sequenceExecutables.Add(element);
@@ -46,7 +46,7 @@ internal class Sequence : ISequence
     public ISequence With(ITween tween)
     {
         tween.Pause();
-        var element = new TweenSequenceExecetable(tween, _duration - _lastAppendDuration);
+        var element = new TweenSequenceExecutable(tween, _duration - _lastAppendDuration);
         element.OnComplete(() => _completedExecutables.Add(element));
         _sequenceExecutables.Add(element);
         return this;

@@ -1,7 +1,7 @@
 
 namespace GroveGames.Tween.Core;
 
-internal class TweenSequenceExecetable : ISequenceExecutable
+internal class TweenSequenceExecutable : ISequenceExecutable
 {
     public float ExecutionTime => _executionTime;
 
@@ -12,7 +12,7 @@ internal class TweenSequenceExecetable : ISequenceExecutable
     private readonly float _executionTime;
     private readonly ITween _tween;
 
-    public TweenSequenceExecetable(ITween tween, float executionTime)
+    public TweenSequenceExecutable(ITween tween, float executionTime)
     {
         _executionTime = executionTime;
         _tween = tween;
