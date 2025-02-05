@@ -159,6 +159,7 @@ internal class Sequence : ISequence
     public void Reset()
     {
         _sequenceExecutables.Clear();
+        _completedExecutables.Clear();
         _id = -1;
         _onComplete = null;
         _onStop = null;
