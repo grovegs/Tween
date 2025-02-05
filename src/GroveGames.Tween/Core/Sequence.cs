@@ -5,7 +5,7 @@ namespace GroveGames.Tween.Core;
 internal class Sequence : ISequence
 {
     private readonly List<ISequenceExecutable> _sequenceExecutables;
-    private readonly HashSet<ISequenceExecutable> _finishedExcuteables;
+    private readonly HashSet<ISequenceExecutable> _completedExecutables;
 
     private float _elapsedTime;
     private float _duration;
@@ -27,7 +27,7 @@ internal class Sequence : ISequence
     internal Sequence()
     {
         _sequenceExecutables = [];
-        _finishedExcuteables = [];
+        _completedExecutables = [];
         _isRunning = true;
         _isPlaying = true;
     }
@@ -37,7 +37,7 @@ internal class Sequence : ISequence
         tween.Pause();
         _lastAppendDuration = tween.Duration;
         var element = new TweenSequenceExecetable(tween, _duration);
-        element.OnComplete(() => _finishedExcuteables.Add(element));
+        element.OnComplete(() => _completedExecutables.Add(element));
         _duration += tween.Duration;
         _sequenceExecutables.Add(element);
         return this;
@@ -47,7 +47,7 @@ internal class Sequence : ISequence
     {
         tween.Pause();
         var element = new TweenSequenceExecetable(tween, _duration - _lastAppendDuration);
-        element.OnComplete(() => _finishedExcuteables.Add(element));
+        element.OnComplete(() => _completedExecutables.Add(element));
         _sequenceExecutables.Add(element);
         return this;
     }
@@ -55,7 +55,7 @@ internal class Sequence : ISequence
     public ISequence Callback(Action callback)
     {
         var element = new ActionSequenceExecutable(callback, _duration);
-        element.OnComplete(() => _finishedExcuteables.Add(element));
+        element.OnComplete(() => _completedExecutables.Add(element));
         _sequenceExecutables.Add(element);
         return this;
     }
@@ -137,10 +137,10 @@ internal class Sequence : ISequence
         {
             var currentElement = _sequenceExecutables[i];
 
-            if (_finishedExcuteables.Contains(currentElement))
+            if (_completedExecutables.Contains(currentElement))
             {
                 _sequenceExecutables.RemoveAt(i);
-                _finishedExcuteables.Remove(currentElement);
+                _completedExecutables.Remove(currentElement);
                 continue;
             }
 
