@@ -9,7 +9,6 @@ public class TweenerContext
 {
     private readonly List<ITween> _tweens;
     private readonly HashSet<ITween> _stoppedTweens;
-    private readonly HashSet<ITween> _completedTweens;
 
     private readonly IMultiTypeObjectPool<ITween> _multiTypeObjectPool;
     private readonly IObjectPool<ISequence> _sequencePool;
@@ -18,7 +17,6 @@ public class TweenerContext
     {
         _tweens = [];
         _stoppedTweens = [];
-        _completedTweens = [];
         _multiTypeObjectPool = new MultiTypeObjectPool<ITween>();
         _sequencePool = new ObjectPool<ISequence>(10, new SequencePooledObjectStrategy());
     }
@@ -33,26 +31,33 @@ public class TweenerContext
         var tween = _multiTypeObjectPool.Get<ITween<T>>();
         var tweenInstance = (Tween<T>)tween;
         tweenInstance.Construct(start, end, duration, lerpFunc, autoPlay);
-        tween.SetOnStop(() => _multiTypeObjectPool.Return(tween));
-        tween.SetOnComplete(() => _completedTweens.Add(tween));
+        tween.SetOnStop(OnCompleteOrStop);
+        tween.SetOnComplete(OnCompleteOrStop);
         _tweens.Add(tween);
 
         return tweenInstance;
+
+        void OnCompleteOrStop()
+        {
+            _stoppedTweens.Add(tween);
+            _multiTypeObjectPool.Return(tween);
+        }
     }
 
     public ISequence CreateSequnce()
     {
         var sequence = _sequencePool.Get();
-        sequence.SetOnComplete(() => _completedTweens.Add(sequence));
-        sequence.SetOnStop(() => _sequencePool.Return(sequence));
+        sequence.SetOnComplete(OnCompleteOrStop);
+        sequence.SetOnStop(OnCompleteOrStop);
         _tweens.Add(sequence);
 
         return sequence;
-    }
 
-    public void Stop(ITween tween)
-    {
-        _stoppedTweens.Add(tween);
+        void OnCompleteOrStop()
+        {
+            _stoppedTweens.Add(sequence);
+            _multiTypeObjectPool.Return(sequence);
+        }
     }
 
     public void Stop(int id)
@@ -61,7 +66,7 @@ public class TweenerContext
         {
             if (tween.Id == id)
             {
-                Stop(tween);
+                tween.Stop();
                 break;
             }
         }
@@ -77,15 +82,6 @@ public class TweenerContext
             {
                 _tweens.RemoveAt(i);
                 _stoppedTweens.Remove(tween);
-                tween.Stop();
-                continue;
-            }
-
-            if (_completedTweens.Contains(tween))
-            {
-                _tweens.RemoveAt(i);
-                _multiTypeObjectPool.Return(tween);
-                _completedTweens.Remove(tween);
                 continue;
             }
 
