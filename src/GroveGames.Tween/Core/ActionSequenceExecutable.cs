@@ -10,6 +10,7 @@ internal class ActionSequenceExecutable : ISequenceExecutable
 
     private readonly float _executionTime;
     private readonly Action _action;
+    private Action _onComplete;
 
     public ActionSequenceExecutable(Action action, float executionTime)
     {
@@ -20,11 +21,17 @@ internal class ActionSequenceExecutable : ISequenceExecutable
     public void Execute()
     {
         _action?.Invoke();
+        _onComplete?.Invoke();
     }
 
     public void Stop()
     {
 
+    }
+
+    public void OnComplete(Action onComplete)
+    {
+        _onComplete = onComplete;
     }
 }
 

@@ -1,3 +1,4 @@
+
 namespace GroveGames.Tween.Core;
 
 internal class TweenSequenceExecetable : ISequenceExecutable
@@ -25,6 +26,11 @@ internal class TweenSequenceExecetable : ISequenceExecutable
     public void Stop()
     {
         _tween.Stop();
+    }
+
+    public void OnComplete(Action onComplete)
+    {
+        _tween.SetOnComplete(onComplete);
     }
 }
 

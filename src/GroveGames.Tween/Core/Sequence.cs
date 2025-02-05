@@ -5,6 +5,7 @@ namespace GroveGames.Tween.Core;
 internal class Sequence : ISequence
 {
     private readonly List<ISequenceExecutable> _sequenceExecutables;
+    private readonly HashSet<ISequenceExecutable> _finishedExcuteables;
 
     private float _elapsedTime;
     private float _duration;
@@ -26,6 +27,7 @@ internal class Sequence : ISequence
     internal Sequence()
     {
         _sequenceExecutables = [];
+        _finishedExcuteables = [];
         _isRunning = true;
         _isPlaying = true;
     }
@@ -35,6 +37,7 @@ internal class Sequence : ISequence
         tween.Pause();
         _lastAppendDuration = tween.Duration;
         var element = new TweenSequenceExecetable(tween, _duration);
+        element.OnComplete(() => _finishedExcuteables.Add(element));
         _duration += tween.Duration;
         _sequenceExecutables.Add(element);
         return this;
@@ -44,6 +47,7 @@ internal class Sequence : ISequence
     {
         tween.Pause();
         var element = new TweenSequenceExecetable(tween, _duration - _lastAppendDuration);
+        element.OnComplete(() => _finishedExcuteables.Add(element));
         _sequenceExecutables.Add(element);
         return this;
     }
@@ -51,6 +55,7 @@ internal class Sequence : ISequence
     public ISequence Callback(Action callback)
     {
         var element = new ActionSequenceExecutable(callback, _duration);
+        element.OnComplete(() => _finishedExcuteables.Add(element));
         _sequenceExecutables.Add(element);
         return this;
     }
@@ -131,6 +136,14 @@ internal class Sequence : ISequence
         for (var i = _sequenceExecutables.Count - 1; i >= 0; i--)
         {
             var currentElement = _sequenceExecutables[i];
+
+            if (_finishedExcuteables.Contains(currentElement))
+            {
+                _sequenceExecutables.RemoveAt(i);
+                _finishedExcuteables.Remove(currentElement);
+                continue;
+            }
+
             if (_elapsedTime >= currentElement.ExecutionTime && !currentElement.IsPlaying)
             {
                 currentElement.Execute();
