@@ -56,7 +56,7 @@ public class TweenerContext
         void OnCompleteOrStop()
         {
             _stoppedTweens.Add(sequence);
-            _multiTypeObjectPool.Return(sequence);
+            _sequencePool.Return(sequence);
         }
     }
 
