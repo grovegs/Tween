@@ -44,9 +44,10 @@ public class TweenerContext
         }
     }
 
-    public ISequence CreateSequnce()
+    public ISequence CreateSequnce(bool autoPlay = true)
     {
         var sequence = _sequencePool.Get();
+        ((Sequence)sequence).Construct(autoPlay);
         sequence.SetOnComplete(OnCompleteOrStop);
         sequence.SetOnStop(OnCompleteOrStop);
         _tweens.Add(sequence);

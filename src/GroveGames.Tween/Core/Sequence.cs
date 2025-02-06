@@ -32,6 +32,12 @@ internal class Sequence : ISequence
         _isPlaying = true;
     }
 
+    internal void Construct(bool autoPlay = true)
+    {
+        _isRunning = true;
+        _isPlaying = autoPlay;
+    }
+
     public ISequence Then(ITween tween)
     {
         tween.Pause();
