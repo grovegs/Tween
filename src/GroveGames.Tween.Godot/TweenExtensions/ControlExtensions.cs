@@ -2,6 +2,7 @@ using Godot;
 
 using GroveGames.Tween.Context;
 using GroveGames.Tween.Core;
+using GroveGames.Tween.Easing;
 using GroveGames.Tween.Lerp;
 
 namespace GroveGames.Tween.TweenExtensions;
@@ -373,8 +374,7 @@ public static class ControlExtensions
 
         tween.SetOnUpdate(progress =>
         {
-            var easeOutElastic = Mathf.Pow(2, -10 * progress) * Mathf.Sin((progress - 0.075f) * (2 * Mathf.Pi) / 0.3f) + 1;
-            source.GlobalPosition = originalPosition + punchStrength * easeOutElastic;
+            source.GlobalPosition = originalPosition + punchStrength * progress;
         });
 
         tween.SetOnComplete(() =>
@@ -382,7 +382,7 @@ public static class ControlExtensions
             source.GlobalPosition = originalPosition;
         });
 
-        return tween;
+        return tween.SetEase(EaseType.OutElastic);
     }
 
     public static ITween PunchRotation(
@@ -403,8 +403,7 @@ public static class ControlExtensions
 
         tween.SetOnUpdate(progress =>
         {
-            var easeOutElastic = Mathf.Pow(2, -10 * progress) * Mathf.Sin((progress - 0.075f) * (2 * Mathf.Pi) / 0.3f) + 1;
-            source.Rotation = originalRotation + punchStrength * easeOutElastic;
+            source.Rotation = originalRotation + punchStrength * progress;
         });
 
         tween.SetOnComplete(() =>
@@ -412,7 +411,7 @@ public static class ControlExtensions
             source.Rotation = originalRotation;
         });
 
-        return tween;
+        return tween.SetEase(EaseType.OutElastic);
     }
 
     public static ITween PunchScale(
@@ -433,8 +432,7 @@ public static class ControlExtensions
 
         tween.SetOnUpdate(progress =>
         {
-            var easeOutElastic = Mathf.Pow(2, -10 * progress) * Mathf.Sin((progress - 0.075f) * (2 * Mathf.Pi) / 0.3f) + 1;
-            source.Scale = originalScale + punchStrength * easeOutElastic;
+            source.Scale = originalScale + punchStrength * progress;
         });
 
         tween.SetOnComplete(() =>
@@ -442,6 +440,6 @@ public static class ControlExtensions
             source.Scale = originalScale;
         });
 
-        return tween;
+        return tween.SetEase(EaseType.OutElastic);
     }
 }
