@@ -28,4 +28,14 @@ public static class LerpFunctions
         FloatLerp(start.Z, end.Z, t)
         );
     }
+
+    public static Color ColorLerp(Color a, Color b, float t)
+    {
+        return new Color(
+            FloatLerp(a.R, b.R, t),
+            FloatLerp(a.G, b.G, t),
+            FloatLerp(a.B, b.B, t),
+            FloatLerp(a.A, b.A, t)
+        );
+    }
 }
