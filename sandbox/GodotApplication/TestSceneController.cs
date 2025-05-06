@@ -1,3 +1,5 @@
+using System;
+
 using Godot;
 
 using GroveGames.Tween;
@@ -46,16 +48,26 @@ public partial class TestSceneController : Node3D
         .Then(moveLeftTween)
         .Then(scaleTween)
         .Then(_cube.RotateYTo(360, 2f, _context).SetLoops(LoopType.Yoyo, 3))
-        .Then(_cube.RotateYTo(360, 2f, _context).SetLoops(LoopType.Restart, -1))
+        .With(_cube.ScaleTo(Vector3.Zero, 2f, _context).SetLoops(LoopType.Restart, 3))
         .SetOnComplete(() =>
-        {
-            GD.Print("Sequence is Completed");
-            _cube.QueueFree();
-        });
+            {
+                GD.Print($"Completed Frame: {Engine.GetFramesDrawn()}");
+                GD.Print("Sequence is Completed");
+                _cube.QueueFree();
+            });
     }
 
     public override void _Process(double delta)
     {
-        _context.Update((float)delta);
+        try
+        {
+            _context?.Update((float)delta);
+        }
+        catch (Exception e)
+        {
+            GD.PrintErr($"Exception Frame: {Engine.GetFramesDrawn()}");
+            GD.PrintErr($"Exception in _Process: {e}");
+            _context = null;
+        }
     }
 }
