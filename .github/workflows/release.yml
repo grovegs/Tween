@@ -17,7 +17,7 @@ jobs:
   release:
     uses: grovegs/workflows/.github/workflows/godot-package-release.yml@main
     with:
-      name: Dependency Injection
+      name: Tween
       core-project: src/GroveGames.Tween
       godot-project: src/GroveGames.Tween.Godot
       godot-addon: src/GroveGames.Tween.Godot/addons/GroveGames.Tween
