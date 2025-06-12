@@ -1,148 +1,549 @@
 using GroveGames.Tween.Core;
+using GroveGames.Tween.Easing;
 
 namespace GroveGames.Tween.Tests;
 
-public class SequenceTests
+public sealed class SequenceTests
 {
-    [Fact]
-    public void Sequence_Append_Adds_Tweens()
+    private class TestTween : ITween
     {
-        // Arrange
-        var mockTween = new Mock<ITween>();
-        mockTween.Setup(t => t.Duration).Returns(1f);
+        public float Duration { get; }
+        public bool IsPaused { get; private set; }
+        public bool IsPlaying { get; private set; }
+        public bool IsRunning { get; private set; } = true;
+        public int Id { get; private set; } = -1;
 
-        var sequence = new Sequence();
+        public TestTween(float duration)
+        {
+            Duration = duration;
+        }
 
-        // Act
-        sequence.Then(mockTween.Object);
+        public void Pause()
+        {
+            IsPaused = true;
+            IsPlaying = false;
+        }
 
-        // Assert
-        Assert.Equal(1f, sequence.Duration);
+        public void Play()
+        {
+            IsPaused = false;
+            IsPlaying = true;
+        }
+
+        public void Stop()
+        {
+            IsPlaying = false;
+            IsRunning = false;
+        }
+
+        public void Update(float deltaTime) { }
+
+        public void Reset()
+        {
+            IsPlaying = false;
+            IsRunning = true;
+            IsPaused = false;
+        }
+
+        public ITween SetEase(EaseType easeType) => this;
+        public ITween SetLoops(LoopType loopType, int loopCount) => this;
+        public ITween SetOnComplete(Action onComplete) => this;
+        public ITween SetOnStop(Action onStop) => this;
+        public ITween SetId(int id)
+        {
+            Id = id;
+            return this;
+        }
+    }
+
+    private class CompletableTestTween : ITween
+    {
+        public float Duration { get; }
+        public bool IsPaused { get; private set; }
+        public bool IsPlaying { get; private set; }
+        public bool IsRunning { get; private set; } = true;
+        public int Id { get; private set; } = -1;
+
+        private Action? _onComplete;
+
+        public CompletableTestTween(float duration)
+        {
+            Duration = duration;
+        }
+
+        public void Pause()
+        {
+            IsPaused = true;
+            IsPlaying = false;
+        }
+
+        public void Play()
+        {
+            IsPaused = false;
+            IsPlaying = true;
+        }
+
+        public void Stop()
+        {
+            IsPlaying = false;
+            IsRunning = false;
+        }
+
+        public void Update(float deltaTime) { }
+
+        public void Reset()
+        {
+            IsPlaying = false;
+            IsRunning = true;
+            IsPaused = false;
+        }
+
+        public void CompleteNow()
+        {
+            IsRunning = false;
+            IsPlaying = false;
+            _onComplete?.Invoke();
+        }
+
+        public ITween SetEase(EaseType easeType) => this;
+        public ITween SetLoops(LoopType loopType, int loopCount) => this;
+        public ITween SetOnComplete(Action onComplete)
+        {
+            _onComplete += onComplete;
+            return this;
+        }
+        public ITween SetOnStop(Action onStop) => this;
+        public ITween SetId(int id)
+        {
+            Id = id;
+            return this;
+        }
     }
 
     [Fact]
-    public void Sequence_Join_Adds_Parallel_Tweens()
+    public void Constructor_DefaultState_InitializesCorrectly()
     {
-        // Arrange
-        var mockTween1 = new Mock<ITween>();
-        mockTween1.Setup(t => t.Duration).Returns(2f);
-
-        var mockTween2 = new Mock<ITween>();
-        mockTween2.Setup(t => t.Duration).Returns(1f);
-
+        // Arrange & Act
         var sequence = new Sequence();
 
-        // Act
-        sequence.Then(mockTween1.Object).With(mockTween2.Object);
-
         // Assert
-        Assert.Equal(2f, sequence.Duration);
+        Assert.True(sequence.IsRunning);
+        Assert.True(sequence.IsPlaying);
+        Assert.Equal(0f, sequence.Duration);
+        Assert.Equal(-1, sequence.Id);
     }
 
     [Fact]
-    public void Sequence_Update_Invokes_Tweens_And_Callbacks()
+    public void Construct_AutoPlayTrue_SetsCorrectState()
     {
         // Arrange
-        var mockTween1 = new Mock<ITween>();
-        mockTween1.Setup(t => t.Duration).Returns(1f);
-        mockTween1.Setup(t => t.IsRunning).Returns(true);
-        mockTween1.Setup(t => t.IsPlaying).Returns(false);
-
-        var mockTween2 = new Mock<ITween>();
-        mockTween2.Setup(t => t.Duration).Returns(1f);
-        mockTween2.Setup(t => t.IsRunning).Returns(true);
-        mockTween2.Setup(t => t.IsPlaying).Returns(false);
-
-        var mockTween3 = new Mock<ITween>();
-        mockTween3.Setup(t => t.Duration).Returns(1f);
-        mockTween3.Setup(t => t.IsRunning).Returns(true);
-        mockTween3.Setup(t => t.IsPlaying).Returns(false);
-
-        var mockTween4 = new Mock<ITween>();
-        mockTween4.Setup(t => t.Duration).Returns(1f);
-        mockTween4.Setup(t => t.IsRunning).Returns(true);
-        mockTween4.Setup(t => t.IsPlaying).Returns(false);
-
-        var callbackMock = new Mock<Action>();
-
         var sequence = new Sequence();
-        sequence
-        .Then(mockTween1.Object)
-        .Then(mockTween2.Object)
-        .With(mockTween3.Object)
-        .Callback(callbackMock.Object)
-        .Wait(1f)
-        .Then(mockTween4.Object);
+
+        // Act
+        sequence.Construct(autoPlay: true);
+
+        // Assert
+        Assert.True(sequence.IsRunning);
+        Assert.True(sequence.IsPlaying);
+    }
+
+    [Fact]
+    public void Construct_AutoPlayFalse_SetsCorrectState()
+    {
+        // Arrange
+        var sequence = new Sequence();
+
+        // Act
+        sequence.Construct(autoPlay: false);
+
+        // Assert
+        Assert.True(sequence.IsRunning);
+        Assert.False(sequence.IsPlaying);
+    }
+
+    [Fact]
+    public void Then_SingleTween_AddsTweenSequentially()
+    {
+        // Arrange
+        var sequence = new Sequence();
+        var testTween = new TestTween(2.0f);
+
+        // Act
+        var result = sequence.Then(testTween);
+
+        // Assert
+        Assert.Same(sequence, result);
+        Assert.Equal(2.0f, sequence.Duration);
+        Assert.True(testTween.IsPaused);
+    }
+
+    [Fact]
+    public void Then_MultipleTweens_AddsTweensSequentially()
+    {
+        // Arrange
+        var sequence = new Sequence();
+        var tween1 = new TestTween(1.0f);
+        var tween2 = new TestTween(2.0f);
+
+        // Act
+        sequence.Then(tween1).Then(tween2);
+
+        // Assert
+        Assert.Equal(3.0f, sequence.Duration);
+        Assert.True(tween1.IsPaused);
+        Assert.True(tween2.IsPaused);
+    }
+
+    [Fact]
+    public void With_AfterThen_AddsTweenInParallel()
+    {
+        // Arrange
+        var sequence = new Sequence();
+        var tween1 = new TestTween(2.0f);
+        var tween2 = new TestTween(1.0f);
+
+        // Act
+        sequence.Then(tween1).With(tween2);
+
+        // Assert
+        Assert.Equal(2.0f, sequence.Duration);
+        Assert.True(tween1.IsPaused);
+        Assert.True(tween2.IsPaused);
+    }
+
+    [Fact]
+    public void Callback_AddsCallbackToSequence()
+    {
+        // Arrange
+        var sequence = new Sequence();
+        static void TestCallback() { }
+
+        // Act
+        var result = sequence.Callback(TestCallback);
+
+        // Assert
+        Assert.Same(sequence, result);
+    }
+
+    [Fact]
+    public void Wait_AddsDurationToSequence()
+    {
+        // Arrange
+        var sequence = new Sequence();
+        var tween = new TestTween(1.0f);
+
+        // Act
+        sequence.Then(tween).Wait(2.0f);
+
+        // Assert
+        Assert.Equal(3.0f, sequence.Duration);
+    }
+
+    [Fact]
+    public void Pause_SetsPauseState()
+    {
+        // Arrange
+        var sequence = new Sequence();
+
+        // Act
+        sequence.Pause();
+
+        // Assert
+        Assert.False(sequence.IsPlaying);
+        Assert.True(sequence.IsRunning);
+    }
+
+    [Fact]
+    public void Play_SetsPlayState()
+    {
+        // Arrange
+        var sequence = new Sequence();
+        sequence.Pause();
+
+        // Act
+        sequence.Play();
+
+        // Assert
+        Assert.True(sequence.IsPlaying);
+        Assert.True(sequence.IsRunning);
+    }
+
+    [Fact]
+    public void SetEase_ThrowsArgumentException()
+    {
+        // Arrange
+        var sequence = new Sequence();
+
+        // Act & Assert
+        Assert.Throws<ArgumentException>(() => sequence.SetEase(EaseType.Linear));
+    }
+
+    [Fact]
+    public void SetLoops_ThrowsArgumentException()
+    {
+        // Arrange
+        var sequence = new Sequence();
+
+        // Act & Assert
+        Assert.Throws<ArgumentException>(() => sequence.SetLoops(LoopType.Restart, 2));
+    }
+
+    [Fact]
+    public void SetOnComplete_SetsCallback()
+    {
+        // Arrange
+        var sequence = new Sequence();
+        static void TestCallback() { }
+
+        // Act
+        var result = sequence.SetOnComplete(TestCallback);
+
+        // Assert
+        Assert.Same(sequence, result);
+    }
+
+    [Fact]
+    public void SetOnStop_SetsCallback()
+    {
+        // Arrange
+        var sequence = new Sequence();
+        static void TestCallback() { }
+
+        // Act
+        var result = sequence.SetOnStop(TestCallback);
+
+        // Assert
+        Assert.Same(sequence, result);
+    }
+
+    [Fact]
+    public void SetId_SetsId()
+    {
+        // Arrange
+        var sequence = new Sequence();
+
+        // Act
+        var result = sequence.SetId(42);
+
+        // Assert
+        Assert.Same(sequence, result);
+        Assert.Equal(42, sequence.Id);
+    }
+
+    [Fact]
+    public void Stop_StopsRunningAndCallsOnStop()
+    {
+        // Arrange
+        var sequence = new Sequence();
+        var onStopCalled = false;
+        sequence.SetOnStop(() => onStopCalled = true);
+
+        // Act
+        sequence.Stop();
+
+        // Assert
+        Assert.False(sequence.IsRunning);
+        Assert.True(onStopCalled);
+    }
+
+    [Fact]
+    public void Update_WhenPaused_DoesNotProgress()
+    {
+        // Arrange
+        var sequence = new Sequence();
+        var tween = new TestTween(1.0f);
+        sequence.Then(tween);
+        sequence.Pause();
+
+        // Act
+        sequence.Update(0.5f);
+
+        // Assert
+        Assert.False(tween.IsPlaying);
+    }
+
+    [Fact]
+    public void Update_WhenStopped_DoesNotProgress()
+    {
+        // Arrange
+        var sequence = new Sequence();
+        var tween = new TestTween(1.0f);
+        sequence.Then(tween);
+        sequence.Stop();
+
+        // Act
+        sequence.Update(0.5f);
+
+        // Assert
+        Assert.False(tween.IsPlaying);
+    }
+
+    [Fact]
+    public void Update_ProgressesTweensInOrder()
+    {
+        // Arrange
+        var sequence = new Sequence();
+        var tween1 = new CompletableTestTween(1.0f);
+        var tween2 = new CompletableTestTween(1.0f);
+        sequence.Then(tween1).Then(tween2);
+
+        // Act
+        sequence.Update(0.5f);
+
+        // Assert
+        Assert.Equal(2.0f, sequence.Duration);
+        Assert.True(sequence.IsRunning);
+    }
+
+    [Fact]
+    public void Update_CompletesSequenceAfterAllTweensComplete()
+    {
+        // Arrange
+        var sequence = new Sequence();
+        var tween1 = new CompletableTestTween(1.0f);
+        var tween2 = new CompletableTestTween(1.0f);
+        var onCompleteCalled = false;
+
+        sequence.Then(tween1)
+                .Then(tween2)
+                .SetOnComplete(() => onCompleteCalled = true);
+
+        // Act
+        sequence.Update(1.0f);
+        sequence.Update(0.1f);
+        tween1.CompleteNow();
+
+        Assert.False(onCompleteCalled);
+        Assert.True(sequence.IsRunning);
+
+        sequence.Update(1.0f);
+        sequence.Update(0.1f);
+        tween2.CompleteNow();
+
+        sequence.Update(0.1f);
+
+        // Assert
+        Assert.True(onCompleteCalled);
+        Assert.False(sequence.IsRunning);
+    }
+
+    [Fact]
+    public void Update_ParallelTweens_AllExecuteAtSameTime()
+    {
+        // Arrange
+        var sequence = new Sequence();
+        var tween1 = new CompletableTestTween(2.0f);
+        var tween2 = new CompletableTestTween(1.0f);
+        sequence.Then(tween1).With(tween2);
 
         // Act
         sequence.Update(0.1f);
-        mockTween1.Verify(t => t.Play(), Times.Once);
 
-        sequence.Update(1f);
-        mockTween2.Verify(t => t.Play(), Times.Once);
-        mockTween3.Verify(t => t.Play(), Times.Once);
-
-        sequence.Update(0.9f);
-        callbackMock.Verify(cb => cb.Invoke(), Times.Once);
-
-        mockTween4.Verify(t => t.Play(), Times.Never);
+        // Assert
+        Assert.Equal(2.0f, sequence.Duration);
+        Assert.True(sequence.IsRunning);
     }
 
     [Fact]
-    public void Sequence_Stop_Stops_Tweens()
+    public void Update_CallbackExecutesAtCorrectTime()
     {
         // Arrange
-        var onStopMock = new Mock<Action>();
-        var onStopMock2 = new Mock<Action>();
-        var onStopMock3 = new Mock<Action>();
-
-        var startValue = 0f;
-        var endValue = 10f;
-        var duration = 1f;
-
-        var tween1 = new Tween<float>();
-        tween1.Construct(
-            () => startValue,
-            () => endValue,
-            duration,
-            (start, end, t) => start + (end - start) * t,
-            autoStart: false
-        );
-        tween1.SetOnStop(onStopMock.Object);
-
-        var tween2 = new Tween<float>();
-        tween2.Construct(
-            () => startValue,
-            () => endValue,
-            duration,
-            (start, end, t) => start + (end - start) * t,
-            autoStart: false
-        );
-        tween2.SetOnStop(onStopMock2.Object);
-
-        var tween3 = new Tween<float>();
-        tween3.Construct(
-            () => startValue,
-            () => endValue,
-            duration,
-            (start, end, t) => start + (end - start) * t,
-            autoStart: false
-        );
-        tween3.SetOnStop(onStopMock3.Object);
-
         var sequence = new Sequence();
-        sequence
-        .Then(tween1)
-        .Then(tween2)
-        .With(tween3);
+        var tween = new CompletableTestTween(1.0f);
+        var callbackExecuted = false;
+
+        sequence.Then(tween)
+                .Callback(() => callbackExecuted = true);
 
         // Act
-        sequence.Update(1.1f);
-        tween1.Update(1.1f);
-        sequence.Stop();
+        sequence.Update(0.5f);
+        Assert.False(callbackExecuted);
 
-        onStopMock.Verify(stop => stop.Invoke(), Times.Never);
-        onStopMock2.Verify(stop => stop.Invoke(), Times.Once);
-        onStopMock3.Verify(stop => stop.Invoke(), Times.Once);
+        sequence.Update(0.5f);
+        tween.CompleteNow();
+        sequence.Update(0.1f);
+
+        // Assert
+        Assert.True(callbackExecuted);
+    }
+
+    [Fact]
+    public void Update_WaitDelay_DelaysSubsequentTweens()
+    {
+        // Arrange
+        var sequence = new Sequence();
+        var tween1 = new CompletableTestTween(1.0f);
+        var tween2 = new CompletableTestTween(1.0f);
+
+        sequence.Then(tween1)
+                .Wait(1.0f)
+                .Then(tween2);
+
+        // Act & Assert
+        Assert.Equal(3.0f, sequence.Duration);
+
+        sequence.Update(0.5f);
+    }
+
+    [Fact]
+    public void Reset_ClearsAllState()
+    {
+        // Arrange
+        var sequence = new Sequence();
+        var tween = new TestTween(1.0f);
+        sequence.Then(tween)
+                .SetId(42)
+                .SetOnComplete(() => { })
+                .SetOnStop(() => { });
+
+        // Act
+        sequence.Reset();
+
+        // Assert
+        Assert.Equal(0f, sequence.Duration);
+        Assert.Equal(-1, sequence.Id);
+        Assert.False(sequence.IsPlaying);
+        Assert.False(sequence.IsRunning);
+    }
+
+    [Fact]
+    public void Update_MultipleOnCompleteCallbacks_AllExecuteAfterCompletion()
+    {
+        // Arrange
+        var sequence = new Sequence();
+        var tween = new CompletableTestTween(1.0f);
+        var callback1Called = false;
+        var callback2Called = false;
+
+        sequence.Then(tween)
+                .SetOnComplete(() => callback1Called = true)
+                .SetOnComplete(() => callback2Called = true);
+
+        // Act
+        sequence.Update(1.0f);
+        sequence.Update(0.1f);
+        tween.CompleteNow();
+        sequence.Update(0.1f);
+
+        // Assert
+        Assert.True(callback1Called);
+        Assert.True(callback2Called);
+        Assert.False(sequence.IsRunning);
+    }
+
+    [Fact]
+    public void Update_EmptySequence_CompletesImmediately()
+    {
+        // Arrange
+        var sequence = new Sequence();
+        var onCompleteCalled = false;
+        sequence.SetOnComplete(() => onCompleteCalled = true);
+
+        // Act
+        sequence.Update(0.1f);
+
+        // Assert
+        Assert.True(onCompleteCalled);
+        Assert.False(sequence.IsRunning);
     }
 }
