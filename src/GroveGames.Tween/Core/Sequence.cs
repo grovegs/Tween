@@ -13,23 +13,23 @@ internal class Sequence : ISequence
 
     private bool _isPlaying;
     private bool _isRunning;
+    private int _id;
 
     public bool IsRunning => _isRunning;
     public bool IsPlaying => _isPlaying;
     public float Duration => _duration;
-
     public int Id => _id;
-    private int _id;
 
-    private Action _onComplete;
-    private Action _onStop;
+    private Action? _onComplete;
+    private Action? _onStop;
 
     internal Sequence()
     {
         _sequenceExecutables = [];
         _completedExecutables = [];
-        _isRunning = true;
         _isPlaying = true;
+        _isRunning = true;
+        _id = -1;
     }
 
     internal void Construct(bool autoPlay = true)
@@ -134,10 +134,6 @@ internal class Sequence : ISequence
         }
 
         _elapsedTime += deltaTime;
-        if (_elapsedTime >= _duration)
-        {
-            _isRunning = false;
-        }
 
         for (var i = _sequenceExecutables.Count - 1; i >= 0; i--)
         {
@@ -156,8 +152,9 @@ internal class Sequence : ISequence
             }
         }
 
-        if (!_isRunning)
+        if (_elapsedTime >= _duration && _sequenceExecutables.Count == 0)
         {
+            _isRunning = false;
             _onComplete?.Invoke();
         }
     }

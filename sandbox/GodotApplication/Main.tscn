@@ -1,6 +1,16 @@
-[gd_scene load_steps=2 format=3 uid="uid://5k3oln57k63y"]
+[gd_scene load_steps=3 format=3 uid="uid://5k3oln57k63y"]
 
 [ext_resource type="Script" path="res://Main.cs" id="1_gb60r"]
 
-[node name="Main" type="Node2D"]
+[sub_resource type="BoxMesh" id="BoxMesh_fq7r8"]
+
+[node name="Main" type="Node3D" node_paths=PackedStringArray("_cube")]
 script = ExtResource("1_gb60r")
+_cube = NodePath("Cube")
+
+[node name="Camera3D" type="Camera3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 1.55228)
+
+[node name="Cube" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -0.989898)
+mesh = SubResource("BoxMesh_fq7r8")
