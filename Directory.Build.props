@@ -1,35 +1,53 @@
 <Project>
-
   <PropertyGroup>
-    <TargetFramework>net8.0</TargetFramework>
-    <GenerateDocumentationFile>true</GenerateDocumentationFile>
-    <ImplicitUsings>enable</ImplicitUsings>
+    <LangVersion>latest</LangVersion>
     <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <NoWarn>1591;1573</NoWarn>
 
     <RootNamespace>GroveGames.Tween</RootNamespace>
-    <Title>GroveGames.Tween</Title>
-    <Description>Lightweight Tween library for Godot C#</Description>
     <Company>Grove Games</Company>
     <Authors>Grove Games</Authors>
-    <Copyright>© Grove Games</Copyright>
+    <Copyright>© $([System.DateTime]::Now.ToString("yyyy")) Grove Games</Copyright>
 
-    <PackageId>$(AssemblyName)</PackageId>
-    <PackageVersion>$(Version)</PackageVersion>
-    <PackageTags>godot;tween;grovegames</PackageTags>
-    <PackageProjectUrl>https://github.com/grovegs/Tween</PackageProjectUrl>
-    <PackageReadmeFile>README.md</PackageReadmeFile>
-    <PackageLicenseFile>LICENSE</PackageLicenseFile>
-    <PackageIcon>Icon.png</PackageIcon>
-
-    <RepositoryType>git</RepositoryType>
-    <RepositoryUrl>https://github.com/grovegs/Tween</RepositoryUrl>
+    <PublishRepositoryUrl>true</PublishRepositoryUrl>
+    <EmbedUntrackedSources>true</EmbedUntrackedSources>
+    <IncludeSymbols>true</IncludeSymbols>
+    <SymbolPackageFormat>snupkg</SymbolPackageFormat>
+    <ContinuousIntegrationBuild Condition="'$(GITHUB_ACTIONS)' == 'true'">true</ContinuousIntegrationBuild>
   </PropertyGroup>
 
-  <ItemGroup>
-    <None Include="../../README.md" Pack="true" PackagePath="/" />
-    <None Include="../../LICENSE" Pack="true" PackagePath="/" />
-    <None Include="../../Icon.png" Pack="true" PackagePath="/" />
+  <PropertyGroup Condition="'$(IsTestProject)' != 'true'">
+    <Version>0.0.1</Version>
+    <PackageId>$(AssemblyName)</PackageId>
+    <PackageProjectUrl>https://github.com/grovegs/Tween</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/grovegs/Tween</RepositoryUrl>
+    <PackageLicenseFile>LICENSE</PackageLicenseFile>
+    <PackageIcon>Icon.png</PackageIcon>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <Description>Lightweight Tween library for Godot C#</Description>
+    <PackageTags>godot;tween;grovegames</PackageTags>
+  </PropertyGroup>
+
+  <ItemGroup Condition="'$(TargetFramework)' == 'netstandard2.1'">
+    <Using Include="System" />
+    <Using Include="System.Buffers" />
+    <Using Include="System.Collections.Generic" />
+    <Using Include="System.Globalization" />
+    <Using Include="System.IO" />
+    <Using Include="System.Linq" />
+    <Using Include="System.Threading" />
+    <Using Include="System.Threading.Tasks" />
   </ItemGroup>
 
+  <ItemGroup Condition="'$(IsTestProject)' != 'true'">
+    <None Include="$(MSBuildThisFileDirectory)README.md" Pack="true" PackagePath="/" />
+    <None Include="$(MSBuildThisFileDirectory)LICENSE" Pack="true" PackagePath="/" />
+    <None Include="$(MSBuildThisFileDirectory)Icon.png" Pack="true" PackagePath="/" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.SourceLink.GitHub" Version="8.0.0" PrivateAssets="all" />
+  </ItemGroup>
 </Project>
