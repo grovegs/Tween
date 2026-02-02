@@ -10,12 +10,13 @@ on:
       - main
       - develop
 
+permissions:
+  contents: read
+
 jobs:
-  format:
-    uses: grovegs/workflows/.github/workflows/godot-package-format.yml@v0.0.1
+  release:
+    uses: grovegs/workflows/.github/workflows/package-format.yml@v1.1.7
     with:
-      core-project: src/GroveGames.Tween
-      godot-project: src/GroveGames.Tween.Godot
-      core-test-project: tests/GroveGames.Tween.Tests
-      godot-test-project: tests/GroveGames.Tween.Godot.Tests
+      files: "**/*.{json,md}"
+      dotnet-project: .
       global-json-file: global.json
