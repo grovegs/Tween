@@ -11,9 +11,14 @@ on:
       - develop
 
 jobs:
-  tests:
-    uses: grovegs/workflows/.github/workflows/godot-package-tests.yml@v0.0.1
+  core-tests:
+    uses: grovegs/workflows/.github/workflows/package-tests.yml@v1.3.0
     with:
-      core-test-project: tests/GroveGames.Tween.Tests
-      godot-test-project: tests/GroveGames.Tween.Godot.Tests
+      dotnet-project: tests/GroveGames.Tween.Tests
+      global-json-file: global.json
+
+  godot-tests:
+    uses: grovegs/workflows/.github/workflows/package-tests.yml@v1.3.0
+    with:
+      dotnet-project: tests/GroveGames.Tween.Godot.Tests
       global-json-file: global.json
