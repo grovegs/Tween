@@ -19,7 +19,7 @@ permissions:
 jobs:
   release:
     name: Release Package
-    uses: grovegs/workflows/.github/workflows/package-release.yml@v1.3.0
+    uses: grovegs/workflows/.github/workflows/package-release.yml@v1.3.2
     with:
       package-name: Tween
       version-type: ${{ inputs.version-type }}
