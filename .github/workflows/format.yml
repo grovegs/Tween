@@ -12,7 +12,7 @@ on:
 
 jobs:
   format:
-    uses: grovegs/workflows/.github/workflows/package-format.yml@v1.3.0
+    uses: grovegs/workflows/.github/workflows/package-format.yml@v1.3.6
     with:
       files: "**/*.{json,md}"
       dotnet-project: .
