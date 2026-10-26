@@ -12,14 +12,24 @@ on:
           - major
           - minor
           - patch
+      environment:
+        description: Development publishes to GitHub Packages, Production publishes to nuget.org and GitHub Releases
+        required: true
+        default: Development
+        type: choice
+        options:
+          - Development
+          - Production
 
 permissions:
   contents: write
+  actions: read
+  packages: write
 
 jobs:
   release:
     name: Release Package
-    uses: grovegs/workflows/.github/workflows/package-release.yml@v1.3.0
+    uses: grovegs/workflows/.github/workflows/package-release.yml@v1.4.0
     with:
       package-name: Tween
       version-type: ${{ inputs.version-type }}
@@ -31,8 +41,9 @@ jobs:
       license-file: LICENSE
       godot-addon: src/GroveGames.Tween.Godot/addons/GroveGames.Tween
       create-tag: true
-      publish-github: true
-      publish-nuget: true
+      publish-github: ${{ inputs.environment == 'Production' }}
+      publish-nuget: ${{ inputs.environment == 'Production' }}
+      publish-github-packages: ${{ inputs.environment == 'Development' }}
     secrets:
       github-token: ${{ secrets.GITHUB_TOKEN }}
       client-id: ${{ secrets.CLIENT_ID }}
