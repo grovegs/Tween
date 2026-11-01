@@ -1,102 +1,17 @@
 # CLAUDE.md
 
-## Commands
+## Package
 
-```bash
-dotnet build
-dotnet format
-dotnet test
-dotnet pack -c Release
-```
+- The core is the `GroveGames.Tween` NuGet package at `src/GroveGames.Tween` (`net10.0`, `net9.0`, `net8.0`, `netstandard2.1`). It depends on `GroveGames.Scheduling` for `TimeMode` and `ScheduleToken`, and on `System.Runtime.CompilerServices.Unsafe` for netstandard2.1. Tests are in `tests/GroveGames.Tween.Tests` (xUnit v3), benchmarks in `sandbox/DotnetBenchmark`.
+- `Tweener` keeps one `TweenStorage<T, TAdapter>` per value type and adapter, created on first use and indexed by `TweenStorageId<T, TAdapter>`. Floats are built in. Other types go through the generic `Create<T, TAdapter>`, `CreatePunch<T, TAdapter>` and `CreateShake<T, TAdapter>`. Storages update in creation order, then sequence callbacks.
+- Exceptions from setters and callbacks go to the handler passed to the `Tweener` constructor. The tween that threw is removed and the others keep running.
+- The Unity package at `src/GroveGames.Tween.Unity/Packages/com.grovegames.tween` references `GroveGames.Tween.dll` and `GroveGames.Scheduling.dll`, installed with NuGetForUnity. `TweenerExtensions` adds `Vector2`, `Vector3` and `Color` overloads on `ITweener`. They call the generic methods on the sealed `Tweener` directly when they can, because generic interface calls are slow in IL2CPP. There is no Godot addon.
+- The GroveGames.DependencyInjection integration in `Integrations/GroveGames.DependencyInjection` compiles only when that package is installed. It adds `AddTweener()`, which logs exceptions with `Debug.LogException`, and `TweenerUpdater` feeds Unity's deltas to `Update` before each frame.
+- Performance matters. Creating, updating and canceling tweens must not allocate after warm-up, and `TweenerAllocationTests` checks that in both xUnit and Unity.
 
 ## Code Rules
 
-- Use initializers only in constructor bodies, not field declarations (except for static constants and simple static readonly values)
-- Use zero-allocation APIs (Span\<T\>, ReadOnlySpan\<T\>, stackalloc, etc.) when available
-- net10.0 supports most optimizations natively
-- netstandard2.1 includes Span\<T\>/ReadOnlySpan\<T\> natively
-- For netstandard2.1: use official NuGet packages only when needed (e.g., `System.Threading.Channels`, `Microsoft.Bcl.TimeProvider`)
-- When no official package exists, write polyfills in `Polyfills/` using C# 14 extension members
-- Follow `.editorconfig` naming: `_camelCase` for private fields, `s_camelCase` for static, `IPascalCase` for interfaces
-- Seal implementation classes unless designed for inheritance
-- Interface-first design for public APIs
-- Use readonly for fields that don't change after construction
-- Use ArgumentNullException.ThrowIfNull(), ArgumentOutOfRangeException.ThrowIfGreaterThan(), and ObjectDisposedException.ThrowIf() for validation
-- For thread-safe classes: use volatile int _disposed with Interlocked for disposal
-- For single-threaded classes: use bool _disposed
-- Create separate concurrent implementations when thread safety is needed (e.g., ObjectPool vs ConcurrentObjectPool)
-- Only use volatile and Interlocked when concurrent access is required
-
-## Performance Rules
-
-- Avoid LINQ in hot paths (use for loops instead)
-- Prefer structs for small data types (< 16 bytes)
-- Use ArrayPool\<T\> for temporary buffers
-- Use stackalloc for small allocations (< 1KB)
-- Use FrozenDictionary/FrozenSet for read-only lookups after initialization
-- Use ImmutableArray for immutable collections
-- Use List\<T\> for mutable collections
-- Prefer ValueTask over Task when result is often synchronous
-
-## Testing Rules
-
-- Use xUnit v3
-- No mocking frameworks (no Moq)
-- Create private test doubles as nested classes within test files
-- Name test doubles with "Test" prefix (e.g., TestLogProcessor)
-- Make test doubles private sealed nested classes
-- Test file names mirror source file names with "Tests" suffix
-- Each test file must be self-contained
-- Use AAA pattern (Arrange-Act-Assert)
-- Test method naming: MethodName_Condition_Expected
-
-## Architecture
-
-- Core library targets: `net10.0` (AOT enabled) and `netstandard2.1`
-- Polyfills in `Polyfills/` folder for netstandard2.1 compatibility
-- Unity package extends core via `netstandard2.1` dependency
-- Godot addon extends core via `net10.0` dependency
-
-## Unity/Godot Engine Code Rules
-
-- Never throw C# exceptions (ArgumentNullException, ArgumentException, etc.) in engine implementations
-- Use engine-specific error handling instead:
-  - Unity: `Debug.LogError()`, `Debug.LogWarning()`, `Debug.Assert()`
-  - Godot: `GD.PushError()`, `GD.PushWarning()`, `GD.Assert()`
-- Check parameters for null and provide fallback values with engine logging
-- Example Unity: `if (settings == null) { Debug.LogError("Settings cannot be null"); settings = CreateInstance<Settings>(); }`
-- Example Godot: `if (settings == null) { GD.PushError("Settings cannot be null"); settings = new(); }`
-
-## Unity/Godot Configuration Patterns
-
-**Unity Settings:**
-
-- Use ScriptableObject for project-wide settings (stored in Assets/Settings/)
-- Use EditorBuildSettings.AddConfigObject() for runtime access
-- Settings provider in Editor/ folder using UI Toolkit (PropertyField, VisualElement)
-- No singletons - settings accessed via GetOrCreate()
-- No Resources.Load() - EditorBuildSettings.TryGetConfigObject() for runtime
-- Factory accepts settings instance for DI-friendly architecture
-
-**Unity C# Configuration:**
-
-- Unity projects must include `csc.rsp` file in `Assets/` directory to enable C# 10 features:
-
-  ```text
-  -langversion:10
-  -nullable:enable
-  ```
-
-- This enables nullable reference types and C# 10 language features (pattern matching, global usings, etc.)
-- Required for compatibility with the core library that uses modern C# features
-- The `csc.rsp` file is in the Unity project, not the package root (Unity compiles the project, not individual packages)
-
-**Godot Settings:**
-
-- Use Resource for project-wide settings (stored at res://addons/)
-- Resource path registered in ProjectSettings for runtime access
-- [GlobalClass] partial class inheriting from Resource
-- No singletons - settings accessed via GetOrCreate()
-- ResourceLoader.Load() for runtime (path from ProjectSettings)
-- Factory accepts settings instance for DI-friendly architecture
-- Optional: Reference same resource via [Export] in nodes for DI
+- No comments.
+- Unity code uses block namespaces and C# 10.
+- Every file and folder in the package needs a `.meta` with a 32-character lowercase hex GUID. Existing asmdef GUIDs must not change, because projects reference them.
+- Tests are named `MethodName_Condition_Expected`, with arrange, act and assert separated by blank lines. Unity tests are EditMode tests in `Tests/Editor`.

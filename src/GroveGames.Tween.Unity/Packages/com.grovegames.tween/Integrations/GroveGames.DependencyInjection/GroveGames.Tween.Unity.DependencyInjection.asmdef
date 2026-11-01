@@ -1,0 +1,29 @@
+{
+    "name": "GroveGames.Tween.Unity.DependencyInjection",
+    "rootNamespace": "GroveGames.Tween.Unity",
+    "references": [
+        "GUID:a01c68ff0a4443c1b95d194a64f9b64e",
+        "GUID:680da9f8e63646ddb3c20c2f4045387d"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": true,
+    "precompiledReferences": [
+        "GroveGames.Tween.dll",
+        "GroveGames.Scheduling.dll",
+        "GroveGames.DependencyInjection.dll"
+    ],
+    "autoReferenced": false,
+    "defineConstraints": [
+        "GROVEGAMES_DEPENDENCYINJECTION"
+    ],
+    "versionDefines": [
+        {
+            "name": "com.grovegames.dependencyinjection",
+            "expression": "0.6.0",
+            "define": "GROVEGAMES_DEPENDENCYINJECTION"
+        }
+    ],
+    "noEngineReferences": false
+}
