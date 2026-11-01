@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
     inputs:
       version-type:
-        description: "Select the version to increment (major, minor, patch)"
+        description: Select the version to increment such as major, minor, or patch
         required: true
         default: patch
         type: choice
@@ -12,16 +12,26 @@ on:
           - major
           - minor
           - patch
+      environment:
+        description: Development publishes to GitHub Packages, Production publishes to nuget.org and GitHub Releases
+        required: true
+        default: Development
+        type: choice
+        options:
+          - Development
+          - Production
 
 permissions:
   contents: write
+  actions: read
+  packages: write
 
 jobs:
   release:
     name: Release Package
-    uses: grovegs/workflows/.github/workflows/package-release.yml@v1.3.0
+    uses: grovegs/workflows/.github/workflows/package-release.yml@v1.4.6
     with:
-      package-name: Tween
+      package-name: "Tween"
       version-type: ${{ inputs.version-type }}
       runs-on: ubuntu-latest
       dotnet-project: src/GroveGames.Tween
@@ -29,12 +39,15 @@ jobs:
       directory-build-props: Directory.Build.props
       readme-file: README.md
       license-file: LICENSE
-      godot-addon: src/GroveGames.Tween.Godot/addons/GroveGames.Tween
+      unity-package: src/GroveGames.Tween.Unity/Packages/com.grovegames.tween
       create-tag: true
-      publish-github: true
-      publish-nuget: true
+      publish-github: ${{ inputs.environment == 'Production' }}
+      publish-nuget: ${{ inputs.environment == 'Production' }}
+      publish-github-packages: ${{ inputs.environment == 'Development' }}
+      publish-discord: true
     secrets:
       github-token: ${{ secrets.GITHUB_TOKEN }}
       client-id: ${{ secrets.CLIENT_ID }}
       app-private-key: ${{ secrets.APP_PRIVATE_KEY }}
       nuget-api-key: ${{ secrets.NUGET_API_KEY }}
+      discord-webhook: ${{ secrets.DISCORD_WEBHOOK }}

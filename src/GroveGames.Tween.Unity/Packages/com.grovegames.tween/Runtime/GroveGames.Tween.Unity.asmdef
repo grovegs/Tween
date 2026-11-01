@@ -1,0 +1,17 @@
+{
+    "name": "GroveGames.Tween.Unity",
+    "rootNamespace": "GroveGames.Tween.Unity",
+    "references": [],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": true,
+    "precompiledReferences": [
+        "GroveGames.Tween.dll",
+        "GroveGames.Scheduling.dll"
+    ],
+    "autoReferenced": false,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

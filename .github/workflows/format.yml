@@ -10,9 +10,13 @@ on:
       - main
       - develop
 
+permissions:
+  contents: read
+  packages: read
+
 jobs:
-  format:
-    uses: grovegs/workflows/.github/workflows/package-format.yml@v1.3.0
+  release:
+    uses: grovegs/workflows/.github/workflows/package-format.yml@v1.4.6
     with:
       files: "**/*.{json,md}"
       dotnet-project: .

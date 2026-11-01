@@ -10,15 +10,13 @@ on:
       - main
       - develop
 
+permissions:
+  contents: read
+  packages: read
+
 jobs:
-  core-tests:
-    uses: grovegs/workflows/.github/workflows/package-tests.yml@v1.3.0
+  release:
+    uses: grovegs/workflows/.github/workflows/package-tests.yml@v1.4.6
     with:
       dotnet-project: tests/GroveGames.Tween.Tests
-      global-json-file: global.json
-
-  godot-tests:
-    uses: grovegs/workflows/.github/workflows/package-tests.yml@v1.3.0
-    with:
-      dotnet-project: tests/GroveGames.Tween.Godot.Tests
       global-json-file: global.json
