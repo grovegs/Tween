@@ -1,40 +1,85 @@
 name: 🚀 Release
 
 on:
+  schedule:
+    - cron: "0 6 * * 1"
   workflow_dispatch:
     inputs:
       version-type:
-        description: "Select the version to increment (major, minor, patch)"
+        description: Select the version to increment, or auto to read it from the commits
         required: true
-        default: patch
+        default: auto
         type: choice
         options:
+          - auto
           - major
           - minor
           - patch
+      environment:
+        description: Development publishes a -dev version to GitHub Packages, Production publishes to nuget.org and GitHub Releases. Scheduled runs release Production when src changed.
+        required: true
+        default: Development
+        type: choice
+        options:
+          - Development
+          - Production
 
 permissions:
   contents: write
+  actions: read
+  packages: write
 
 jobs:
   release:
     name: Release Package
-    uses: grovegs/workflows/.github/workflows/package-release.yml@v1.3.0
+    uses: grovegs/workflows/.github/workflows/package-release.yml@v1.5.0
     with:
-      package-name: Tween
-      version-type: ${{ inputs.version-type }}
+      package-name: "Tween"
+      version-type: ${{ inputs.version-type || 'auto' }}
+      version-suffix: ${{ inputs.environment == 'Development' && 'dev' || '' }}
       runs-on: ubuntu-latest
       dotnet-project: src/GroveGames.Tween
       global-json-file: global.json
       directory-build-props: Directory.Build.props
       readme-file: README.md
       license-file: LICENSE
-      godot-addon: src/GroveGames.Tween.Godot/addons/GroveGames.Tween
+      unity-package: src/GroveGames.Tween.Unity/Packages/com.grovegames.tween
       create-tag: true
-      publish-github: true
-      publish-nuget: true
+      publish-github: ${{ inputs.environment != 'Development' }}
+      publish-nuget: false
+      publish-github-packages: ${{ inputs.environment == 'Development' }}
+      publish-discord: true
+      skip-unchanged: ${{ github.event_name == 'schedule' }}
     secrets:
       github-token: ${{ secrets.GITHUB_TOKEN }}
       client-id: ${{ secrets.CLIENT_ID }}
       app-private-key: ${{ secrets.APP_PRIVATE_KEY }}
-      nuget-api-key: ${{ secrets.NUGET_API_KEY }}
+      discord-webhook: ${{ secrets.DISCORD_WEBHOOK }}
+
+  publish-nuget:
+    name: Publish to NuGet
+    needs: release
+    if: needs.release.outputs.has-changes == 'true' && inputs.environment != 'Development'
+    runs-on: ubuntu-latest
+    permissions:
+      id-token: write
+
+    steps:
+      - name: 📤 Publish to NuGet
+        uses: grovegs/actions/.github/actions/publish-nuget@v1.6.0
+        with:
+          artifact: nuget-package
+          user: ${{ secrets.NUGET_USER }}
+
+      - name: 📢 Notify Discord Failure
+        if: failure()
+        continue-on-error: true
+        uses: grovegs/actions/.github/actions/notify-discord@v1.6.0
+        with:
+          webhook-url: ${{ secrets.DISCORD_WEBHOOK }}
+          title: ❌ ${{ github.event.repository.name }} NuGet publish failed (${{ github.ref_name }})
+          description: |
+            The release was created, but publishing to nuget.org failed. Check the trusted publishing policy, then rerun the failed job.
+
+            [View Workflow Run](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})
+          color: "15158332"

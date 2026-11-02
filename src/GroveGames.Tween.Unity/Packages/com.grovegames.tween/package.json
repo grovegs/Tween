@@ -1,0 +1,20 @@
+{
+  "name": "com.grovegames.tween",
+  "version": "0.0.0",
+  "displayName": "GroveGames.Tween",
+  "description": "Zero-allocation tweens and sequences for .NET and Unity",
+  "unity": "2021.3",
+  "documentationUrl": "https://github.com/grovegs/Tween",
+  "changelogUrl": "https://github.com/grovegs/Tween/releases",
+  "licensesUrl": "https://github.com/grovegs/Tween/blob/main/LICENSE",
+  "keywords": [
+    "tween",
+    "tweening",
+    "animation",
+    "easing"
+  ],
+  "author": {
+    "name": "Grove Games",
+    "url": "https://github.com/grovegs"
+  }
+}

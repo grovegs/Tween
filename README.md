@@ -1,170 +1,108 @@
 # GroveGames.Tween
 
+Zero-allocation tweens and sequences for .NET and Unity.
+
+[![NuGet](https://img.shields.io/nuget/v/GroveGames.Tween)](https://www.nuget.org/packages/GroveGames.Tween)
 [![Build Status](https://github.com/grovegs/Tween/actions/workflows/release.yml/badge.svg)](https://github.com/grovegs/Tween/actions/workflows/release.yml)
 [![Tests](https://github.com/grovegs/Tween/actions/workflows/tests.yml/badge.svg)](https://github.com/grovegs/Tween/actions/workflows/tests.yml)
 [![Latest Release](https://img.shields.io/github/v/release/grovegs/Tween)](https://github.com/grovegs/Tween/releases/latest)
-[![NuGet](https://img.shields.io/nuget/v/GroveGames.Tween)](https://www.nuget.org/packages/GroveGames.Tween)
 
-GroveGames.Tween is a lightweight and extensible tweening library for Godot, designed to animate values smoothly over time. It provides an easy-to-use API for creating tweens and sequences, with built-in easing functions for smooth transitions.
+---
 
 ## Features
 
-- **Flexible Tweening**: Tween any type of value, including `float`, `Vector3`, and more.
-- **Ease Functions**: Use predefined easing functions to customize the motion.
-- **Sequences**: Chain tweens and callbacks for complex animations.
-- **Extensions**: Built-in support for animating properties of `Godot Nodes`, such as position, rotation, and scale.
-- **Customizable Behavior**: Easily add callbacks for updates and completions.
-
----
+- **Core**: `ITweener` and `Tweener` in the `GroveGames.Tween` NuGet package tween floats out of the box and any other type through an `ITweenAdapter<T>` struct. Tweens of each type live in their own storage, so creating, updating and canceling them allocates nothing after warm-up.
+- **Builder**: `Create(from, to, duration)` returns a `TweenBuilder<T>`. `WithEase`, `WithDelay`, `WithLoops`, `WithTimeMode`, `WithToken` and `WithCompletionCallback` return a modified copy, and `Bind(state, setter)` starts the tween with a static setter that captures nothing.
+- **Eases and loops**: 31 eases, `Restart` and `Yoyo` loops with an optional interval between them, punch tweens that spring back to the start, and shake tweens that move through caller-provided points and back.
+- **Sequences**: `CreateSequence()` chains tweens with `Append`, `Join`, `AppendInterval` and `AppendCallback`, and cancels them together.
+- **Clocks and cancellation**: Scaled, unscaled and realtime clocks and `ScheduleToken` come from [GroveGames.Scheduling](https://github.com/grovegs/Scheduling). Handles report `IsActive` and `Cancel()` a single tween or sequence.
+- **Unity**: The Unity package adds `Vector2`, `Vector3` and `Color` tweens, `CreatePunch` for `Vector3` and `CreateShake` for `Vector2` and `Vector3`.
+- **Dependency injection**: `AddTweener()` registers `ITweener` with [GroveGames.DependencyInjection](https://github.com/grovegs/DependencyInjection), logs callback exceptions with `Debug.LogException` and updates the tweener from Unity's time every frame.
 
 ## Installation
 
-### Using NuGet
-
-To add GroveGames.Tween.Godot to your project, install the NuGet package:
+### .NET
 
 ```bash
-dotnet add package GroveGames.Tween.Godot
+dotnet add package GroveGames.Tween
 ```
 
-Alternatively, use the Package Manager Console in Visual Studio:
+### Unity
 
-```bash
-Install-Package GroveGames.Tween.Godot
+Install the core through [NuGetForUnity](https://github.com/GlitchEnzo/NuGetForUnity) (`GroveGames.Tween`, which brings `GroveGames.Scheduling`), then add both packages to `Packages/manifest.json`:
+
+```json
+{
+    "dependencies": {
+        "com.grovegames.scheduling": "https://github.com/grovegs/Scheduling.git?path=src/GroveGames.Scheduling.Unity/Packages/com.grovegames.scheduling",
+        "com.grovegames.tween": "https://github.com/grovegs/Tween.git?path=src/GroveGames.Tween.Unity/Packages/com.grovegames.tween"
+    }
+}
 ```
 
-Once installed, ensure that your project references the `GroveGames.Tween` namespace and its sub-namespaces.
+The core uses C# 10, so add a `csc.rsp` to `Assets/`:
 
----
+```text
+-langversion:10
+-nullable:enable
+```
 
 ## Usage
 
-### Basic Tween Example
+Create a tweener with a handler for exceptions thrown by setters and callbacks, and update it once per frame:
 
 ```csharp
-using Godot;
-using GroveGames.Tween.Core;
+var tweener = new Tweener(Debug.LogException);
 
-public class Example : Node3D
+tweener.Update(deltaTime, unscaledDeltaTime, realtimeDeltaTime);
+```
+
+Bind a tween to a state object with a static setter so it allocates nothing:
+
+```csharp
+var handle = tweener.Create(0f, 1f, 0.3f)
+    .WithEase(Ease.OutQuad)
+    .Bind(canvasGroup, static (alpha, group) => group.alpha = alpha);
+
+handle.Cancel();
+```
+
+Chain tweens in a sequence:
+
+```csharp
+tweener.CreateSequence()
+    .Append(tweener.Create(Vector3.one, Vector3.one * 1.2f, 0.1f), transform, static (scale, target) => target.localScale = scale)
+    .Append(tweener.Create(Vector3.one * 1.2f, Vector3.one, 0.1f), transform, static (scale, target) => target.localScale = scale)
+    .AppendCallback(onPressed);
+```
+
+Tween another type with an adapter:
+
+```csharp
+readonly struct DoubleAdapter : ITweenAdapter<double>
 {
-    private TweenerContext _tweenContext;
-
-    public override void _Ready()
+    public double Evaluate(in double from, in double to, float progress)
     {
-        _tweenContext = new TweenerContext();
-
-        // Move this Node3D to a new position over 2 seconds
-        this.MoveTo(new Vector3(5, 5, 0), 2f, _tweenContext)
-            .SetOnComplete(() => GD.Print("Move completed!"));
-    }
-
-    public override void _Process(float delta)
-    {
-        // Update tweens
-        _tweenContext.Update(delta);
+        return from + (to - from) * progress;
     }
 }
+
+tweener.Create<double, DoubleAdapter>(0d, 100d, 1f).Bind(counter, static (value, target) => target.Value = value);
 ```
 
-### Using Sequences
+With GroveGames.DependencyInjection installed, register it in an installer and inject `ITweener`:
 
 ```csharp
-using Godot;
-using GroveGames.Tween.Core;
-
-public class SequenceExample : Node3D
-{
-    private TweenerContext _tweenContext;
-
-    public override void _Ready()
-    {
-        _tweenContext = new TweenerContext();
-
-        var sequence = _tweenContext.CreateSequence();
-        sequence
-            .Then(this.MoveTo(new Vector3(5, 5, 0), 2f, _tweenContext, false))
-            .Wait(1f)
-            .Callback(() => GD.Print("Reached target!"))
-            .Play();
-    }
-
-    public override void _Process(float delta)
-    {
-        _tweenContext.Update(delta);
-    }
-}
+builder.AddTweener();
 ```
 
-### Extension Methods
+## Testing
 
-The library includes handy extension methods for `Node3D, Node2D, Transform3D, Transform2D, etc.` objects. Examples include:
-
-- `MoveTo(Vector3 target, float duration, TweenerContext context)`
-- `RotateTo(Vector3 targetDegrees, float duration, TweenerContext context)`
-- `ScaleTo(Vector3 target, float duration, TweenerContext context)`
-
-Each method has variations to animate specific axes (e.g., `MoveXTo`, `RotateYTo`).
-
----
-
-## API Reference
-
-### Tween Interfaces
-
-#### `ITween`
-
-- `void SetEase(EaseType easeType)`
-- `void SetOnComplete(Action onComplete)`
-- `void Stop(bool complete)`
-- `void Update(float deltaTime)`
-- `void Pause()`
-- `void Play()`
-- `bool IsRunning`
-- `bool IsPlaying`
-- `float Duration`
-
-#### `ITween<T>` (Generic)
-
-- `void SetOnUpdate(Action<T> onUpdate)`
-
-#### `ISequence`
-
-- `ISequence Then(ITween tween)`
-- `ISequence With(ITween tween)`
-- `ISequence Wait(float interval)`
-- `ISequence Callback(Action callback)`
-- `void Reset()`
-
----
-
-## Customization
-
-### Easing Functions
-
-Customize your tweening with easing functions defined in the `EaseType` enum. Example:
-
-```csharp
-tween.SetEase(EaseType.QuadInOut);
+```bash
+dotnet test
 ```
 
-### Custom Lerp Functions
-
-Provide your own interpolation function for advanced use cases:
-
-```csharp
-var tween = context.CreateTween(
-    () => currentValue, 
-    () => targetValue, 
-    duration, 
-    (start, end, t) => start + (end - start) * t
-);
-```
-
----
-
-## Contributing
-
-Contributions are welcome! Feel free to submit issues or pull requests to improve this library.
+The Unity EditMode tests run from `sandbox/UnityApplication` with the Unity Test Runner.
 
 ---
 
