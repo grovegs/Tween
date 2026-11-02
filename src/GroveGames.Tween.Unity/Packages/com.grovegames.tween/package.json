@@ -1,6 +1,6 @@
 {
   "name": "com.grovegames.tween",
-  "version": "0.0.0",
+  "version": "0.1.0",
   "displayName": "GroveGames.Tween",
   "description": "Zero-allocation tweens and sequences for .NET and Unity",
   "unity": "2021.3",
