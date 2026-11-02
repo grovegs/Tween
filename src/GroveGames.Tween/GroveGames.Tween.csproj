@@ -24,7 +24,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="GroveGames.Scheduling" Version="0.1.0" />
+    <PackageReference Include="GroveGames.Scheduling" Version="0.1.1" />
   </ItemGroup>
 
   <ItemGroup Condition="'$(TargetFramework)' == 'netstandard2.1'">
