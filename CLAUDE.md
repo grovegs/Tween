@@ -15,3 +15,9 @@
 - Unity code uses block namespaces and C# 10.
 - Every file and folder in the package needs a `.meta` with a 32-character lowercase hex GUID. Existing asmdef GUIDs must not change, because projects reference them.
 - Tests are named `MethodName_Condition_Expected`, with arrange, act and assert separated by blank lines. Unity tests are EditMode tests in `Tests/Editor`.
+
+## Agent Skills
+
+- The rules for game code that uses this package are an agent skill. Its source is `skills/grovegames-tween/`: `SKILL.md` holds the rules that apply everywhere, `unity.md` and `godot.md` hold only what differs in that engine. An engine file is optional.
+- `scripts/build_skills.sh` writes the skill each engine package ships: `SKILL.md` followed by the engine file, when there is one. Run it after every edit and commit the result. Never edit the copies under `Skills~/` or `addons/`.
+- The NuGet package ships `skills/grovegames-tween/SKILL.md` as it is.
