@@ -96,6 +96,19 @@ With GroveGames.DependencyInjection installed, register it in an installer and i
 builder.AddTweener();
 ```
 
+## Agent Skills
+
+The package ships an agent skill, `grovegames-tween`, with the rules for game code that uses it.
+
+- **Unity:** the skill is in the package's `Skills~` folder.
+- **.NET:** set `GroveGamesAgentSkillsDirectory` and every build copies the skill of each GroveGames package the project references into that folder:
+
+```xml
+<PropertyGroup>
+  <GroveGamesAgentSkillsDirectory>$(MSBuildThisFileDirectory).claude/skills</GroveGamesAgentSkillsDirectory>
+</PropertyGroup>
+```
+
 ## Testing
 
 ```bash
