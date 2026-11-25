@@ -51,6 +51,42 @@ public sealed class TweenerSafetyTests
     }
 
     [Fact]
+    public void Bind_SetterThrowsOnFirstValue_ReportsAndReturnsInactiveHandle()
+    {
+        var exceptions = new List<Exception>();
+        var tweener = new Tweener(exceptions.Add);
+        var calls = new TestTarget();
+
+        var failing = tweener.Create(0f, 1f, 1f).Bind(calls, static (_, target) =>
+        {
+            target.SetValue(target.Value + 1f);
+            throw new InvalidOperationException("Boom");
+        });
+        Step(tweener, 0.5f);
+
+        Assert.Equal("Boom", Assert.Single(exceptions).Message);
+        Assert.False(failing.IsActive);
+        Assert.Equal(1f, calls.Value, Tolerance);
+    }
+
+    [Fact]
+    public void Append_SetterThrowsOnFirstValue_SequenceMovesOn()
+    {
+        var exceptions = new List<Exception>();
+        var tweener = new Tweener(exceptions.Add);
+        var completed = new TestTarget();
+
+        tweener.CreateSequence()
+            .Append(tweener.Create(0f, 1f, 0.5f), completed, static (_, _) => throw new InvalidOperationException("Boom"))
+            .AppendCallback(() => completed.SetValue(1f));
+        Step(tweener, 0.3f);
+        Step(tweener, 0.3f);
+
+        Assert.Single(exceptions);
+        Assert.Equal(1f, completed.Value, Tolerance);
+    }
+
+    [Fact]
     public void Update_CompletionCallbackThrows_ReportsAndKeepsOtherTweens()
     {
         var exceptions = new List<Exception>();

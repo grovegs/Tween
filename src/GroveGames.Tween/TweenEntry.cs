@@ -22,6 +22,7 @@ internal struct TweenEntry<T>
     private readonly int _slot;
     private double _time;
     private bool _isAlive;
+    private bool _isFailed;
 
     public TweenEntry(T from, T to, in TweenTiming timing, TimeMode timeMode, object state, Action<T, object> setter, Action? completed, IReadOnlyList<T>? points, ScheduleToken? token, int sequenceSlot, int sequenceVersion, int slot)
     {
@@ -40,6 +41,7 @@ internal struct TweenEntry<T>
         _slot = slot;
         _time = 0d;
         _isAlive = true;
+        _isFailed = false;
     }
 
     public readonly T From => _from;
@@ -54,6 +56,7 @@ internal struct TweenEntry<T>
     public readonly int SequenceVersion => _sequenceVersion;
     public readonly int Slot => _slot;
     public readonly bool IsAlive => _isAlive;
+    public readonly bool IsFailed => _isFailed;
     public readonly bool IsTokenCanceled => _token != null && _token.IsCanceledSince(_tokenVersion);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -66,5 +69,10 @@ internal struct TweenEntry<T>
     public void Kill()
     {
         _isAlive = false;
+    }
+
+    public void Fail()
+    {
+        _isFailed = true;
     }
 }

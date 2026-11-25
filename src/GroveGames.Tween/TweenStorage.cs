@@ -34,9 +34,9 @@ internal sealed class TweenStorage<T, TAdapter> : ITweenValueStorage<T> where TA
         var slot = _slots.Allocate(index, out version);
         _entries[index] = new TweenEntry<T>(from, to, in timing, timeMode, state, setter, completed, points, token, sequenceSlot, sequenceVersion, slot);
 
-        if (timing.Evaluate(0d, out var progress) != TweenStatus.Delayed)
+        if (timing.Evaluate(0d, out var progress) != TweenStatus.Delayed && !TryInvoke(setter, Evaluate(in _entries[index], progress), state))
         {
-            setter(Evaluate(in _entries[index], progress), state);
+            _entries[index].Fail();
         }
 
         return slot;
@@ -56,7 +56,7 @@ internal sealed class TweenStorage<T, TAdapter> : ITweenValueStorage<T> where TA
                 continue;
             }
 
-            if (IsCanceled(ref entry))
+            if (entry.IsFailed || IsCanceled(ref entry))
             {
                 Kill(ref entry);
                 continue;
@@ -107,7 +107,13 @@ internal sealed class TweenStorage<T, TAdapter> : ITweenValueStorage<T> where TA
 
     public bool IsActive(int slot, int version)
     {
-        return _slots.IsValid(slot, version) && !IsCanceled(ref _entries[_slots.GetValue(slot)]);
+        if (!_slots.IsValid(slot, version))
+        {
+            return false;
+        }
+
+        ref var entry = ref _entries[_slots.GetValue(slot)];
+        return !entry.IsFailed && !IsCanceled(ref entry);
     }
 
     public bool Cancel(int slot, int version)
