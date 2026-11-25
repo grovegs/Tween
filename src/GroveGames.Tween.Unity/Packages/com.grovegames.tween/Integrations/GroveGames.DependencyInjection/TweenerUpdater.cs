@@ -14,12 +14,12 @@ namespace GroveGames.Tween.Unity
             _realtime = Time.realtimeSinceStartupAsDouble;
         }
 
-        public void PreFrameUpdate(float deltaTime)
+        public void PreFrameUpdate(DeltaTime deltaTime)
         {
             var realtime = Time.realtimeSinceStartupAsDouble;
             var realtimeDeltaTime = (float)(realtime - _realtime);
             _realtime = realtime;
-            _tweener.Update(deltaTime, Time.unscaledDeltaTime, realtimeDeltaTime);
+            _tweener.Update(deltaTime.Scaled, deltaTime.Unscaled, realtimeDeltaTime);
         }
     }
 }
