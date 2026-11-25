@@ -21,7 +21,7 @@
     "versionDefines": [
         {
             "name": "com.grovegames.dependencyinjection",
-            "expression": "0.6.0",
+            "expression": "0.11.0",
             "define": "GROVEGAMES_DEPENDENCYINJECTION"
         }
     ],
