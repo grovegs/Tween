@@ -176,7 +176,7 @@ internal sealed class TweenStorage<T, TAdapter> : ITweenValueStorage<T> where TA
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     private bool IsCanceled(ref TweenEntry<T> entry)
     {
-        return entry.IsTokenCanceled || (entry.SequenceSlot >= 0 && !_tweener.IsSequenceValid(entry.SequenceSlot, entry.SequenceVersion));
+        return entry.IsTokenCanceled || (entry.SequenceSlot >= 0 && !_tweener.IsSequenceRunning(entry.SequenceSlot, entry.SequenceVersion));
     }
 
     private void Kill(ref TweenEntry<T> entry)

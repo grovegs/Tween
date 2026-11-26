@@ -111,12 +111,11 @@ public struct TweenBuilder<T>
         return _tweener.Add(in this, state, ToUntyped(setter), -1, 0);
     }
 
-    internal readonly TweenBuilder<T> InSequence(double start, TimeMode timeMode, ScheduleToken? token)
+    internal readonly TweenBuilder<T> InSequence(double start, TimeMode timeMode)
     {
         var builder = this;
         builder._delay = (float)(start + _delay);
         builder._timeMode = timeMode;
-        builder._token = token ?? _token;
         return builder;
     }
 

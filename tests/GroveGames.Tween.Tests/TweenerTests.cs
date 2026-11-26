@@ -527,6 +527,46 @@ public sealed class TweenerTests
         target.SetValue(value);
     }
 
+    [Fact]
+    public void Bind_NaNDuration_ThrowsArgumentOutOfRangeException()
+    {
+        var tweener = CreateTweener();
+        var target = new TestTarget();
+
+        Assert.Throws<ArgumentOutOfRangeException>(() => tweener.Create(0f, 1f, float.NaN).Bind(target, s_setValue));
+    }
+
+    [Fact]
+    public void Bind_NaNDelay_ThrowsArgumentOutOfRangeException()
+    {
+        var tweener = CreateTweener();
+        var target = new TestTarget();
+
+        Assert.Throws<ArgumentOutOfRangeException>(() => tweener.Create(0f, 1f, 1f).WithDelay(float.NaN).Bind(target, s_setValue));
+    }
+
+    [Fact]
+    public void Bind_NaNLoopInterval_ThrowsArgumentOutOfRangeException()
+    {
+        var tweener = CreateTweener();
+        var target = new TestTarget();
+
+        Assert.Throws<ArgumentOutOfRangeException>(() => tweener.Create(0f, 1f, 1f).WithLoops(2, LoopType.Restart, float.NaN).Bind(target, s_setValue));
+    }
+
+    [Fact]
+    public void Update_OneLoopWithInfiniteInterval_Completes()
+    {
+        var tweener = CreateTweener();
+        var target = new TestTarget();
+        var handle = tweener.Create(0f, 1f, 1f).WithLoops(1, LoopType.Restart, float.PositiveInfinity).Bind(target, s_setValue);
+
+        tweener.Update(1.5f, 1.5f, 1.5f);
+
+        Assert.False(handle.IsActive);
+        Assert.Equal(1f, target.Value, Tolerance);
+    }
+
     private static Tweener CreateTweener()
     {
         return new Tweener(static exception => throw new InvalidOperationException("Unexpected tween exception", exception));
