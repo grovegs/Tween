@@ -285,6 +285,41 @@ public sealed class TweenSequenceTests
         Assert.Throws<ArgumentOutOfRangeException>(() => sequence.Append(tweener.Create(0f, 1f, float.NaN), target, s_setValue));
     }
 
+    [Fact]
+    public void Append_NaNDurationAfterAnotherTween_SequenceStillEnds()
+    {
+        var tweener = CreateTweener();
+        var target = new TestTarget();
+        var sequence = tweener.CreateSequence().Append(tweener.Create(0f, 1f, 1f), target, s_setValue);
+
+        Assert.Throws<ArgumentOutOfRangeException>(() => sequence.Append(tweener.Create(0f, 1f, float.NaN), target, s_setValue));
+        Step(tweener, 1.5f);
+
+        Assert.False(sequence.Handle.IsActive);
+    }
+
+    [Fact]
+    public void Token_CanceledMidRun_StopsChildrenAndCallbacks()
+    {
+        var tweener = CreateTweener();
+        var target = new TestTarget();
+        var token = new ScheduleToken();
+        var handle = tweener.CreateSequence(token: token)
+            .Append(tweener.Create(0f, 1f, 1f), target, s_setValue)
+            .AppendCallback(target.Complete)
+            .Handle;
+        Step(tweener, 0.5f);
+        var value = target.Value;
+
+        token.Cancel();
+        var isActiveAfterCancel = handle.IsActive;
+        Step(tweener, 1f);
+
+        Assert.False(isActiveAfterCancel);
+        Assert.Equal(value, target.Value, Tolerance);
+        Assert.Equal(0, target.CompletedCount);
+    }
+
     private static void Step(Tweener tweener, float deltaTime)
     {
         tweener.Update(deltaTime, deltaTime, deltaTime);

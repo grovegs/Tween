@@ -33,7 +33,7 @@ internal readonly struct TweenTiming
         _frequency = frequency;
         _dampingRatio = dampingRatio;
         _period = (double)_duration + _loopInterval;
-        _activeDuration = _loops < 0 ? double.PositiveInfinity : (double)_duration * _loops + (double)_loopInterval * (_loops - 1);
+        _activeDuration = _loops < 0 ? double.PositiveInfinity : (double)_duration * _loops + (_loops > 1 ? (double)_loopInterval * (_loops - 1) : 0d);
     }
 
     public bool IsInfinite => _loops < 0;

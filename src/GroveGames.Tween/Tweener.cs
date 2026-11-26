@@ -130,6 +130,7 @@ public sealed class Tweener : ITweener
 
     internal TweenHandle Add<T>(in TweenBuilder<T> builder, object state, Action<T, object> setter, int sequenceSlot, int sequenceVersion)
     {
+        var timing = builder.Timing;
         var token = builder.Token;
 
         if (token != null && token.IsCanceled)
@@ -139,7 +140,7 @@ public sealed class Tweener : ITweener
 
         AddSequenceChild(sequenceSlot, sequenceVersion);
         var storage = builder.Storage;
-        var slot = storage.Add(builder.From, builder.To, builder.Timing, builder.TimeMode, state, setter, builder.CompletionCallback, builder.Points, token, sequenceSlot, sequenceVersion, out var version);
+        var slot = storage.Add(builder.From, builder.To, in timing, builder.TimeMode, state, setter, builder.CompletionCallback, builder.Points, token, sequenceSlot, sequenceVersion, out var version);
         return new TweenHandle(this, storage.Id, slot, version);
     }
 
