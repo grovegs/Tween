@@ -84,7 +84,7 @@ internal sealed class CallbackStorage
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     private bool IsCanceled(ref CallbackEntry entry)
     {
-        return entry.IsTokenCanceled || !_tweener.IsSequenceValid(entry.SequenceSlot, entry.SequenceVersion);
+        return entry.IsTokenCanceled || !_tweener.IsSequenceRunning(entry.SequenceSlot, entry.SequenceVersion);
     }
 
     private void Kill(ref CallbackEntry entry)

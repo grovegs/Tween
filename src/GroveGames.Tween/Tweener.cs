@@ -22,6 +22,8 @@ public sealed class Tweener : ITweener
     private int _storageCount;
     private double[] _sequenceCursors;
     private double[] _sequenceLastStarts;
+    private ScheduleToken?[] _sequenceTokens;
+    private int[] _sequenceTokenVersions;
     private int[] _pendingSequenceSlots;
     private int[] _pendingSequenceVersions;
     private int _pendingSequenceCount;
@@ -40,6 +42,8 @@ public sealed class Tweener : ITweener
         _sequences = new SlotTable(SequenceCapacity);
         _sequenceCursors = new double[SequenceCapacity];
         _sequenceLastStarts = new double[SequenceCapacity];
+        _sequenceTokens = new ScheduleToken?[SequenceCapacity];
+        _sequenceTokenVersions = new int[SequenceCapacity];
         _pendingSequenceSlots = new int[SequenceCapacity];
         _pendingSequenceVersions = new int[SequenceCapacity];
         _pendingSequenceCount = 0;
@@ -88,10 +92,14 @@ public sealed class Tweener : ITweener
         {
             Array.Resize(ref _sequenceCursors, _sequences.Capacity);
             Array.Resize(ref _sequenceLastStarts, _sequences.Capacity);
+            Array.Resize(ref _sequenceTokens, _sequences.Capacity);
+            Array.Resize(ref _sequenceTokenVersions, _sequences.Capacity);
         }
 
         _sequenceCursors[slot] = 0d;
         _sequenceLastStarts[slot] = 0d;
+        _sequenceTokens[slot] = token;
+        _sequenceTokenVersions[slot] = token != null ? token.Version : 0;
 
         if (_pendingSequenceCount == _pendingSequenceSlots.Length)
         {
@@ -102,7 +110,7 @@ public sealed class Tweener : ITweener
         _pendingSequenceSlots[_pendingSequenceCount] = slot;
         _pendingSequenceVersions[_pendingSequenceCount] = version;
         _pendingSequenceCount++;
-        return new TweenSequenceBuilder(this, slot, version, timeMode, token);
+        return new TweenSequenceBuilder(this, slot, version, timeMode);
     }
 
     public void Update(float deltaTime, float unscaledDeltaTime, float realtimeDeltaTime)
@@ -161,14 +169,20 @@ public sealed class Tweener : ITweener
         return _storagesById[storageId]!.Cancel(slot, version);
     }
 
-    internal bool IsSequenceValid(int slot, int version)
+    internal bool IsSequenceRunning(int slot, int version)
     {
-        return _sequences.IsValid(slot, version);
+        if (!_sequences.IsValid(slot, version))
+        {
+            return false;
+        }
+
+        var token = _sequenceTokens[slot];
+        return token == null || !token.IsCanceledSince(_sequenceTokenVersions[slot]);
     }
 
     internal bool IsSequenceActive(int slot, int version)
     {
-        return _sequences.IsValid(slot, version) && _sequences.GetValue(slot) > 0;
+        return IsSequenceRunning(slot, version) && _sequences.GetValue(slot) > 0;
     }
 
     internal double GetSequenceCursor(int slot, int version)
@@ -211,7 +225,7 @@ public sealed class Tweener : ITweener
             return;
         }
 
-        _sequences.Release(slot);
+        Release(slot);
     }
 
     internal bool CancelSequence(int slot, int version)
@@ -221,7 +235,7 @@ public sealed class Tweener : ITweener
             return false;
         }
 
-        _sequences.Release(slot);
+        Release(slot);
         return true;
     }
 
@@ -261,6 +275,12 @@ public sealed class Tweener : ITweener
         return storage;
     }
 
+    private void Release(int slot)
+    {
+        _sequenceTokens[slot] = null;
+        _sequences.Release(slot);
+    }
+
     private void AddSequenceChild(int slot, int version)
     {
         if (_sequences.IsValid(slot, version))
@@ -277,7 +297,7 @@ public sealed class Tweener : ITweener
 
             if (_sequences.IsValid(slot, _pendingSequenceVersions[i]) && _sequences.GetValue(slot) == 0)
             {
-                _sequences.Release(slot);
+                Release(slot);
             }
         }
 

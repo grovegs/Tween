@@ -19,6 +19,10 @@ internal readonly struct TweenTiming
 
     public TweenTiming(float duration, float delay, int loops, LoopType loopType, float loopInterval, Ease ease, TweenKind kind, int frequency, float dampingRatio)
     {
+        ThrowIfNaN(duration, nameof(duration));
+        ThrowIfNaN(delay, nameof(delay));
+        ThrowIfNaN(loopInterval, nameof(loopInterval));
+
         _duration = Math.Max(duration, 0f);
         _delay = Math.Max(delay, 0f);
         _loops = loops == 0 ? 1 : Math.Max(loops, -1);
@@ -69,6 +73,14 @@ internal readonly struct TweenTiming
         var isReversed = _loopType == LoopType.Yoyo && (loop & 1) == 1;
         progress = Shape(Easing.Evaluate(_ease, isReversed ? 1f - t : t));
         return TweenStatus.Playing;
+    }
+
+    private static void ThrowIfNaN(float value, string name)
+    {
+        if (float.IsNaN(value))
+        {
+            throw new ArgumentOutOfRangeException(name, value, "The value must be a number.");
+        }
     }
 
     private float EvaluateEnd()

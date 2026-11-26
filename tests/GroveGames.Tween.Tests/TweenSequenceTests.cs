@@ -229,6 +229,62 @@ public sealed class TweenSequenceTests
         Assert.Equal(0.5f, target.Value, Tolerance);
     }
 
+    [Fact]
+    public void Append_ChildTokenCanceledInSequenceWithToken_StopsOnlyThatChild()
+    {
+        var tweener = CreateTweener();
+        var canceled = new TestTarget();
+        var other = new TestTarget();
+        var childToken = new ScheduleToken();
+        tweener.CreateSequence(token: new ScheduleToken())
+            .Append(tweener.Create(0f, 1f, 1f).WithToken(childToken), canceled, s_setValue)
+            .Join(tweener.Create(0f, 1f, 1f), other, s_setValue);
+        var setCount = canceled.SetCount;
+
+        childToken.Cancel();
+        Step(tweener, 0.5f);
+
+        Assert.Equal(setCount, canceled.SetCount);
+        Assert.Equal(0.5f, other.Value, Tolerance);
+    }
+
+    [Fact]
+    public void Handle_TrailingInterval_StaysActiveUntilTheIntervalEnds()
+    {
+        var tweener = CreateTweener();
+        var target = new TestTarget();
+        var handle = tweener.CreateSequence()
+            .Append(tweener.Create(0f, 1f, 0.5f), target, s_setValue)
+            .AppendInterval(2f)
+            .Handle;
+
+        Step(tweener, 1f);
+        var isActiveDuringInterval = handle.IsActive;
+        Step(tweener, 1.6f);
+
+        Assert.True(isActiveDuringInterval);
+        Assert.False(handle.IsActive);
+    }
+
+    [Fact]
+    public void AppendInterval_NaN_ThrowsArgumentOutOfRangeException()
+    {
+        var tweener = CreateTweener();
+        var sequence = tweener.CreateSequence();
+
+        Assert.Throws<ArgumentOutOfRangeException>(() => sequence.AppendInterval(float.NaN));
+    }
+
+    [Fact]
+    public void Append_NaNDuration_ThrowsArgumentOutOfRangeException()
+    {
+        var tweener = CreateTweener();
+        var target = new TestTarget();
+        var sequence = tweener.CreateSequence();
+
+        Assert.Throws<ArgumentOutOfRangeException>(() => sequence.Append(tweener.Create(0f, 1f, float.NaN), target, s_setValue));
+    }
+
     private static void Step(Tweener tweener, float deltaTime)
     {
         tweener.Update(deltaTime, deltaTime, deltaTime);
