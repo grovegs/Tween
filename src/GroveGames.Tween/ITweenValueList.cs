@@ -4,7 +4,7 @@ using GroveGames.Scheduling;
 
 namespace GroveGames.Tween;
 
-internal interface ITweenValueStorage<T> : ITweenStorage
+internal interface ITweenValueList<T> : ITweenList
 {
     public int Id { get; }
 

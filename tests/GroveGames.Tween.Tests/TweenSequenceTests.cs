@@ -320,6 +320,39 @@ public sealed class TweenSequenceTests
         Assert.Equal(0, target.CompletedCount);
     }
 
+    [Fact]
+    public void AppendCallback_AfterTweensWithRoundedStarts_RunsAfterTheLastValue()
+    {
+        var tweener = CreateTweener();
+        var target = new TestTarget();
+        var completedBefore = false;
+        tweener.CreateSequence()
+            .Append(tweener.Create(0f, 1f, 0.01f), target, s_setValue)
+            .Append(tweener.Create(1f, 2f, 0.17f), target, s_setValue)
+            .Append(tweener.Create(2f, 3f, 0.02f).WithCompletionCallback(target.Complete), target, s_setValue)
+            .AppendCallback(() => completedBefore = target.CompletedCount == 1);
+
+        Step(tweener, 0.1f);
+        Step(tweener, 0.1f);
+        Step(tweener, 0.1f);
+
+        Assert.True(completedBefore);
+    }
+
+    [Fact]
+    public void Append_NegativeChildDelay_StartsAtTheCursor()
+    {
+        var tweener = CreateTweener();
+        var target = new TestTarget();
+        tweener.CreateSequence()
+            .Append(tweener.Create(0f, 1f, 1f), target, s_setValue)
+            .Append(tweener.Create(5f, 6f, 1f).WithDelay(-0.5f), target, s_setValue);
+
+        Step(tweener, 0.75f);
+
+        Assert.Equal(0.75f, target.Value, Tolerance);
+    }
+
     private static void Step(Tweener tweener, float deltaTime)
     {
         tweener.Update(deltaTime, deltaTime, deltaTime);

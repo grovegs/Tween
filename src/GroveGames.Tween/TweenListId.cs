@@ -2,7 +2,7 @@
 
 namespace GroveGames.Tween;
 
-internal static class TweenStorageIds
+internal static class TweenListId
 {
     private static int s_last = -1;
 
@@ -10,4 +10,9 @@ internal static class TweenStorageIds
     {
         return Interlocked.Increment(ref s_last);
     }
+}
+
+internal static class TweenListId<T, TAdapter> where TAdapter : struct, ITweenAdapter<T>
+{
+    public static readonly int Value = TweenListId.Next();
 }

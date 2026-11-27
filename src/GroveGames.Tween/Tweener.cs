@@ -7,19 +7,20 @@ namespace GroveGames.Tween;
 
 public sealed class Tweener : ITweener
 {
-    private const int StorageCapacity = 16;
-    private const int StorageTypeCapacity = 4;
+    private const int ListCapacity = 16;
+    private const int ListTypeCapacity = 4;
     private const int SequenceCapacity = 8;
     private const int TimeModeCount = 3;
 
     private readonly Action<Exception> _exceptionHandler;
     private readonly float[] _deltaTimes;
-    private readonly TweenStorage<float, FloatTweenAdapter> _floats;
-    private readonly CallbackStorage _callbacks;
+    private readonly TweenList<float, FloatTweenAdapter> _floats;
+    private readonly CallbackList _callbacks;
     private readonly SlotTable _sequences;
-    private ITweenStorage?[] _storagesById;
-    private ITweenStorage[] _storages;
-    private int _storageCount;
+    private ITweenList?[] _listsById;
+    private ITweenList[] _lists;
+    private int[] _listCounts;
+    private int _listCount;
     private double[] _sequenceCursors;
     private double[] _sequenceLastStarts;
     private ScheduleToken?[] _sequenceTokens;
@@ -34,11 +35,12 @@ public sealed class Tweener : ITweener
 
         _exceptionHandler = exceptionHandler;
         _deltaTimes = new float[TimeModeCount];
-        _storagesById = new ITweenStorage?[StorageTypeCapacity];
-        _storages = new ITweenStorage[StorageTypeCapacity];
-        _storageCount = 0;
-        _floats = GetStorage<float, FloatTweenAdapter>();
-        _callbacks = new CallbackStorage(this, StorageCapacity);
+        _listsById = new ITweenList?[ListTypeCapacity];
+        _lists = new ITweenList[ListTypeCapacity];
+        _listCounts = new int[ListTypeCapacity];
+        _listCount = 0;
+        _floats = GetList<float, FloatTweenAdapter>();
+        _callbacks = new CallbackList(this, ListCapacity);
         _sequences = new SlotTable(SequenceCapacity);
         _sequenceCursors = new double[SequenceCapacity];
         _sequenceLastStarts = new double[SequenceCapacity];
@@ -66,22 +68,22 @@ public sealed class Tweener : ITweener
 
     public TweenBuilder<T> Create<T, TAdapter>(T from, T to, float duration) where TAdapter : struct, ITweenAdapter<T>
     {
-        return new(this, GetStorage<T, TAdapter>(), from, to, new TweenSettings(duration), TweenKind.Interpolation, 0, 0f, null);
+        return new(this, GetList<T, TAdapter>(), from, to, new TweenSettings(duration), TweenKind.Interpolation, 0, 0f, null);
     }
 
     public TweenBuilder<T> Create<T, TAdapter>(T from, T to, in TweenSettings settings) where TAdapter : struct, ITweenAdapter<T>
     {
-        return new(this, GetStorage<T, TAdapter>(), from, to, in settings, TweenKind.Interpolation, 0, 0f, null);
+        return new(this, GetList<T, TAdapter>(), from, to, in settings, TweenKind.Interpolation, 0, 0f, null);
     }
 
     public TweenBuilder<T> CreatePunch<T, TAdapter>(T from, T to, float duration, int frequency = 10, float dampingRatio = 1f) where TAdapter : struct, ITweenAdapter<T>
     {
-        return new(this, GetStorage<T, TAdapter>(), from, to, new TweenSettings(duration), TweenKind.Punch, frequency, dampingRatio, null);
+        return new(this, GetList<T, TAdapter>(), from, to, new TweenSettings(duration), TweenKind.Punch, frequency, dampingRatio, null);
     }
 
     public TweenBuilder<T> CreateShake<T, TAdapter>(T from, IReadOnlyList<T> points, float duration) where TAdapter : struct, ITweenAdapter<T>
     {
-        return new(this, GetStorage<T, TAdapter>(), from, from, new TweenSettings(duration), TweenKind.Interpolation, 0, 0f, points);
+        return new(this, GetList<T, TAdapter>(), from, from, new TweenSettings(duration), TweenKind.Interpolation, 0, 0f, points);
     }
 
     public TweenSequenceBuilder CreateSequence(TimeMode timeMode = TimeMode.Scaled, ScheduleToken? token = null)
@@ -120,12 +122,20 @@ public sealed class Tweener : ITweener
         _deltaTimes[(int)TimeMode.Unscaled] = unscaledDeltaTime;
         _deltaTimes[(int)TimeMode.Realtime] = realtimeDeltaTime;
 
-        for (var i = 0; i < _storageCount; i++)
+        var listCount = _listCount;
+        var callbackCount = _callbacks.Count;
+
+        for (var i = 0; i < listCount; i++)
         {
-            _storages[i].Update(_deltaTimes);
+            _listCounts[i] = _lists[i].Count;
         }
 
-        _callbacks.Update(_deltaTimes);
+        for (var i = 0; i < listCount; i++)
+        {
+            _lists[i].Update(_deltaTimes, _listCounts[i]);
+        }
+
+        _callbacks.Update(_deltaTimes, callbackCount);
     }
 
     internal TweenHandle Add<T>(in TweenBuilder<T> builder, object state, Action<T, object> setter, int sequenceSlot, int sequenceVersion)
@@ -139,9 +149,9 @@ public sealed class Tweener : ITweener
         }
 
         AddSequenceChild(sequenceSlot, sequenceVersion);
-        var storage = builder.Storage;
-        var slot = storage.Add(builder.From, builder.To, in timing, builder.TimeMode, state, setter, builder.CompletionCallback, builder.Points, token, sequenceSlot, sequenceVersion, out var version);
-        return new TweenHandle(this, storage.Id, slot, version);
+        var list = builder.TweenList;
+        var slot = list.Add(builder.From, builder.To, in timing, builder.TimeMode, state, setter, builder.CompletionCallback, builder.Points, token, sequenceSlot, sequenceVersion, out var version);
+        return new TweenHandle(this, list.Id, slot, version);
     }
 
     internal void AddCallback(double delay, TimeMode timeMode, Action callback, ScheduleToken? token, int sequenceSlot, int sequenceVersion)
@@ -160,14 +170,14 @@ public sealed class Tweener : ITweener
         _exceptionHandler(exception);
     }
 
-    internal bool IsActive(int storageId, int slot, int version)
+    internal bool IsActive(int listId, int slot, int version)
     {
-        return _storagesById[storageId]!.IsActive(slot, version);
+        return _listsById[listId]!.IsActive(slot, version);
     }
 
-    internal bool Cancel(int storageId, int slot, int version)
+    internal bool Cancel(int listId, int slot, int version)
     {
-        return _storagesById[storageId]!.Cancel(slot, version);
+        return _listsById[listId]!.Cancel(slot, version);
     }
 
     internal bool IsSequenceRunning(int slot, int version)
@@ -241,39 +251,40 @@ public sealed class Tweener : ITweener
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    private TweenStorage<T, TAdapter> GetStorage<T, TAdapter>() where TAdapter : struct, ITweenAdapter<T>
+    private TweenList<T, TAdapter> GetList<T, TAdapter>() where TAdapter : struct, ITweenAdapter<T>
     {
-        var id = TweenStorageId<T, TAdapter>.Value;
+        var id = TweenListId<T, TAdapter>.Value;
 
-        if (id < _storagesById.Length)
+        if (id < _listsById.Length)
         {
-            var storage = _storagesById[id];
+            var list = _listsById[id];
 
-            if (storage != null)
+            if (list != null)
             {
-                return Unsafe.As<TweenStorage<T, TAdapter>>(storage);
+                return Unsafe.As<TweenList<T, TAdapter>>(list);
             }
         }
 
-        return AddStorage<T, TAdapter>(id);
+        return AddList<T, TAdapter>(id);
     }
 
-    private TweenStorage<T, TAdapter> AddStorage<T, TAdapter>(int id) where TAdapter : struct, ITweenAdapter<T>
+    private TweenList<T, TAdapter> AddList<T, TAdapter>(int id) where TAdapter : struct, ITweenAdapter<T>
     {
-        if (id >= _storagesById.Length)
+        if (id >= _listsById.Length)
         {
-            Array.Resize(ref _storagesById, Math.Max(id + 1, _storagesById.Length * 2));
+            Array.Resize(ref _listsById, Math.Max(id + 1, _listsById.Length * 2));
         }
 
-        if (_storageCount == _storages.Length)
+        if (_listCount == _lists.Length)
         {
-            Array.Resize(ref _storages, _storageCount * 2);
+            Array.Resize(ref _lists, _listCount * 2);
+            Array.Resize(ref _listCounts, _listCount * 2);
         }
 
-        var storage = new TweenStorage<T, TAdapter>(this, id, StorageCapacity);
-        _storagesById[id] = storage;
-        _storages[_storageCount++] = storage;
-        return storage;
+        var list = new TweenList<T, TAdapter>(this, id, ListCapacity);
+        _listsById[id] = list;
+        _lists[_listCount++] = list;
+        return list;
     }
 
     private void Release(int slot)

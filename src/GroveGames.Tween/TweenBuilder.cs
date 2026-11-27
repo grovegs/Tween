@@ -9,7 +9,7 @@ namespace GroveGames.Tween;
 public struct TweenBuilder<T>
 {
     private readonly Tweener _tweener;
-    private readonly ITweenValueStorage<T> _storage;
+    private readonly ITweenValueList<T> _list;
     private readonly T _from;
     private readonly T _to;
     private readonly float _duration;
@@ -26,7 +26,7 @@ public struct TweenBuilder<T>
     private ScheduleToken? _token;
     private Action? _completionCallback;
 
-    internal readonly ITweenValueStorage<T> Storage => _storage;
+    internal readonly ITweenValueList<T> TweenList => _list;
     internal readonly T From => _from;
     internal readonly T To => _to;
     internal readonly TimeMode TimeMode => _timeMode;
@@ -35,10 +35,10 @@ public struct TweenBuilder<T>
     internal readonly Action? CompletionCallback => _completionCallback;
     internal readonly TweenTiming Timing => new(_duration, _delay, _loops, _loopType, _loopInterval, _ease, _kind, _frequency, _dampingRatio);
 
-    internal TweenBuilder(Tweener tweener, ITweenValueStorage<T> storage, T from, T to, in TweenSettings settings, TweenKind kind, int frequency, float dampingRatio, IReadOnlyList<T>? points)
+    internal TweenBuilder(Tweener tweener, ITweenValueList<T> list, T from, T to, in TweenSettings settings, TweenKind kind, int frequency, float dampingRatio, IReadOnlyList<T>? points)
     {
         _tweener = tweener;
-        _storage = storage;
+        _list = list;
         _from = from;
         _to = to;
         _duration = settings.Duration;
@@ -114,7 +114,7 @@ public struct TweenBuilder<T>
     internal readonly TweenBuilder<T> InSequence(double start, TimeMode timeMode)
     {
         var builder = this;
-        builder._delay = (float)(start + _delay);
+        builder._delay = (float)(start + Math.Max(_delay, 0f));
         builder._timeMode = timeMode;
         return builder;
     }
