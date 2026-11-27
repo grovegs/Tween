@@ -34,7 +34,7 @@ internal sealed class TweenStorage<T, TAdapter> : ITweenValueStorage<T> where TA
         var slot = _slots.Allocate(index, out version);
         _entries[index] = new TweenEntry<T>(from, to, in timing, timeMode, state, setter, completed, points, token, sequenceSlot, sequenceVersion, slot);
 
-        if (timing.Evaluate(0d, out var progress) != TweenStatus.Delayed && !TryInvoke(setter, Evaluate(in _entries[index], progress), state))
+        if (timing.Evaluate(0d, out var progress) != TweenStatus.Delayed && !TryApply(in _entries[index], progress))
         {
             _entries[index].Fail();
         }
@@ -66,8 +66,7 @@ internal sealed class TweenStorage<T, TAdapter> : ITweenValueStorage<T> where TA
 
             if (status != TweenStatus.Delayed)
             {
-                var value = Evaluate(in entry, progress);
-                var isApplied = TryInvoke(entry.Setter, value, entry.State);
+                var isApplied = TryApply(in entry, progress);
                 entry = ref _entries[read];
 
                 if (!entry.IsAlive)
@@ -136,6 +135,16 @@ internal sealed class TweenStorage<T, TAdapter> : ITweenValueStorage<T> where TA
 
         if (points == null)
         {
+            if (progress == 1f)
+            {
+                return entry.To;
+            }
+
+            if (progress == 0f)
+            {
+                return entry.From;
+            }
+
             return default(TAdapter).Evaluate(entry.From, entry.To, progress);
         }
 
@@ -147,11 +156,11 @@ internal sealed class TweenStorage<T, TAdapter> : ITweenValueStorage<T> where TA
         return default(TAdapter).Evaluate(start, end, position - segment);
     }
 
-    private bool TryInvoke(Action<T, object> setter, T value, object state)
+    private bool TryApply(in TweenEntry<T> entry, float progress)
     {
         try
         {
-            setter(value, state);
+            entry.Setter(Evaluate(in entry, progress), entry.State);
             return true;
         }
         catch (Exception exception)

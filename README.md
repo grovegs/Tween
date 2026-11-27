@@ -13,11 +13,11 @@ Zero-allocation tweens and sequences for .NET and Unity.
 
 - **Core**: `ITweener` and `Tweener` in the `GroveGames.Tween` NuGet package tween floats out of the box and any other type through an `ITweenAdapter<T>` struct. Tweens of each type live in their own storage, so creating, updating and canceling them allocates nothing after warm-up.
 - **Builder**: `Create(from, to, duration)` returns a `TweenBuilder<T>`. `WithEase`, `WithDelay`, `WithLoops`, `WithTimeMode`, `WithToken` and `WithCompletionCallback` return a modified copy, and `Bind(state, setter)` starts the tween with a static setter that captures nothing.
-- **Eases and loops**: 31 eases, `Restart` and `Yoyo` loops with an optional interval between them, punch tweens that spring back to the start, and shake tweens that move through caller-provided points and back.
-- **Sequences**: `CreateSequence()` chains tweens with `Append`, `Join`, `AppendInterval` and `AppendCallback`, and cancels them together. A sequence stays active until its last tween, callback or interval ends. Its token cancels the whole sequence, and a tween's own token still cancels just that tween.
+- **Eases and loops**: 31 eases, `Restart` and `Yoyo` loops with an optional interval between them (any negative count loops forever), punch tweens that spring back to the start, and shake tweens that move through caller-provided points and back.
+- **Sequences**: `CreateSequence()` chains tweens with `Append`, `Join`, `AppendInterval` and `AppendCallback`, and cancels them together. A sequence stays active until its last tween, callback or interval ends. Its token cancels the whole sequence, and a tween's own token still cancels just that tween. Every tween in a sequence runs on the sequence's time mode, so a tween's own `WithTimeMode` is ignored there, and a negative delay counts as zero.
 - **Validation**: A `NaN` duration, delay or interval throws `ArgumentOutOfRangeException` instead of writing `NaN` every frame.
 - **Clocks and cancellation**: Scaled, unscaled and realtime clocks and `ScheduleToken` come from [GroveGames.Scheduling](https://github.com/grovegs/Scheduling). Handles report `IsActive` and `Cancel()` a single tween or sequence.
-- **Unity**: The Unity package adds `Vector2`, `Vector3` and `Color` tweens, `CreatePunch` for `Vector3` and `CreateShake` for `Vector2` and `Vector3`.
+- **Unity**: The Unity package adds `Vector2`, `Vector3` and `Color` tweens, `CreatePunch` for `Vector3` and `CreateShake` for `Vector2` and `Vector3`. The Unity `CreatePunch` takes the punch strength and springs back from `from + strength`, while the core `CreatePunch<T, TAdapter>` takes that end value.
 - **Dependency injection**: `AddTweener()` registers `ITweener` with [GroveGames.DependencyInjection](https://github.com/grovegs/DependencyInjection), logs callback exceptions with `Debug.LogException` and updates the tweener from Unity's time every frame.
 
 ## Installation
@@ -50,7 +50,7 @@ The core uses C# 10, so add a `csc.rsp` to `Assets/`:
 
 ## Usage
 
-Create a tweener with a handler for exceptions thrown by setters and callbacks, and update it once per frame:
+Create a tweener with a handler for exceptions thrown by adapters, setters and callbacks, and update it once per frame. Each frame updates every tween, then every sequence callback, so a tween that starts when a callback runs gets its first value before that callback. A tween, sequence or callback created during an update starts on the next one. A finished tween ends exactly at its `to` value:
 
 ```csharp
 var tweener = new Tweener(Debug.LogException);

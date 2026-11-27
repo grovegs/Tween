@@ -517,6 +517,18 @@ public sealed class TweenerTests
         }
     }
 
+    [Fact]
+    public void Update_Completed_EndsExactlyAtTo()
+    {
+        var tweener = CreateTweener();
+        var target = new TestTarget();
+        tweener.Create(0.7f, 0.1f, 1f).Bind(target, s_setValue);
+
+        Step(tweener, 1f);
+
+        Assert.Equal(0.1f, target.Value);
+    }
+
     private static void Step(Tweener tweener, float deltaTime)
     {
         tweener.Update(deltaTime, deltaTime, deltaTime);

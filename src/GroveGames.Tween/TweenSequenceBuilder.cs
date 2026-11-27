@@ -73,7 +73,7 @@ public readonly struct TweenSequenceBuilder
 
         var child = tween.InSequence(start, _timeMode);
         _tweener.Add(in child, state, setter, _slot, _version);
-        _tweener.PlaceInSequence(_slot, _version, start, start + tween.Timing.TotalDuration, true);
+        _tweener.PlaceInSequence(_slot, _version, start, child.Timing.TotalDuration, true);
         return this;
     }
 }

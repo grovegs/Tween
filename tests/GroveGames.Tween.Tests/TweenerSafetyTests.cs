@@ -132,6 +132,60 @@ public sealed class TweenerSafetyTests
         Assert.Equal(new[] { first }, handles);
     }
 
+    [Fact]
+    public void Update_AdapterThrows_ReportsAndKeepsOthersRunning()
+    {
+        var exceptions = new List<Exception>();
+        var tweener = new Tweener(exceptions.Add);
+        var target = new TestTarget();
+        tweener.Create<float, FakeThrowingAdapter>(0f, 1f, 1f).Bind(new TestTarget(), static (value, target) => target.SetValue(value));
+        tweener.Create(0f, 1f, 1f).Bind(target, static (value, target) => target.SetValue(value));
+
+        Step(tweener, 0.5f);
+        Step(tweener, 0.25f);
+
+        Assert.Single(exceptions);
+        Assert.Equal(0.75f, target.Value, Tolerance);
+    }
+
+    [Fact]
+    public void Update_TweenCreatedInCompletion_StartsNextFrame()
+    {
+        var tweener = new Tweener(static exception => throw new InvalidOperationException("Unexpected tween exception", exception));
+        var target = new TestTarget();
+        tweener.Create(0f, 1f, 0.5f)
+            .WithCompletionCallback(() => tweener.Create<float, FakeLinearAdapter>(0f, 1f, 1f).Bind(target, static (value, target) => target.SetValue(value)))
+            .Bind(new TestTarget(), static (value, target) => target.SetValue(value));
+
+        Step(tweener, 0.5f);
+        var created = target.Value;
+        Step(tweener, 0.5f);
+
+        Assert.Equal(0f, created);
+        Assert.Equal(0.5f, target.Value, Tolerance);
+    }
+
+    private readonly struct FakeThrowingAdapter : ITweenAdapter<float>
+    {
+        public float Evaluate(in float from, in float to, float progress)
+        {
+            if (progress > 0f)
+            {
+                throw new InvalidOperationException("Boom");
+            }
+
+            return from;
+        }
+    }
+
+    private readonly struct FakeLinearAdapter : ITweenAdapter<float>
+    {
+        public float Evaluate(in float from, in float to, float progress)
+        {
+            return from + (to - from) * progress;
+        }
+    }
+
     private static void Step(Tweener tweener, float deltaTime)
     {
         tweener.Update(deltaTime, deltaTime, deltaTime);

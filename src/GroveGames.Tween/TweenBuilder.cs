@@ -114,7 +114,7 @@ public struct TweenBuilder<T>
     internal readonly TweenBuilder<T> InSequence(double start, TimeMode timeMode)
     {
         var builder = this;
-        builder._delay = (float)(start + _delay);
+        builder._delay = (float)(start + Math.Max(_delay, 0f));
         builder._timeMode = timeMode;
         return builder;
     }

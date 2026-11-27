@@ -26,9 +26,10 @@ internal sealed class CallbackStorage
         _entries[_count++] = new CallbackEntry(delay, timeMode, callback, token, sequenceSlot, sequenceVersion);
     }
 
-    public void Update(float[] deltaTimes)
+    public int Count => _count;
+
+    public void Update(float[] deltaTimes, int count)
     {
-        var count = _count;
         var write = 0;
 
         for (var read = 0; read < count; read++)

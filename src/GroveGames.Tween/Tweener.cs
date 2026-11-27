@@ -120,12 +120,15 @@ public sealed class Tweener : ITweener
         _deltaTimes[(int)TimeMode.Unscaled] = unscaledDeltaTime;
         _deltaTimes[(int)TimeMode.Realtime] = realtimeDeltaTime;
 
-        for (var i = 0; i < _storageCount; i++)
+        var storageCount = _storageCount;
+        var callbackCount = _callbacks.Count;
+
+        for (var i = 0; i < storageCount; i++)
         {
             _storages[i].Update(_deltaTimes);
         }
 
-        _callbacks.Update(_deltaTimes);
+        _callbacks.Update(_deltaTimes, callbackCount);
     }
 
     internal TweenHandle Add<T>(in TweenBuilder<T> builder, object state, Action<T, object> setter, int sequenceSlot, int sequenceVersion)
