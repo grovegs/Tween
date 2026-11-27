@@ -11,7 +11,7 @@ Zero-allocation tweens and sequences for .NET and Unity.
 
 ## Features
 
-- **Core**: `ITweener` and `Tweener` in the `GroveGames.Tween` NuGet package tween floats out of the box and any other type through an `ITweenAdapter<T>` struct. Tweens of each type live in their own storage, so creating, updating and canceling them allocates nothing after warm-up.
+- **Core**: `ITweener` and `Tweener` in the `GroveGames.Tween` NuGet package tween floats out of the box and any other type through an `ITweenAdapter<T>` struct. Tweens of each type live in their own list, so creating, updating and canceling them allocates nothing after warm-up.
 - **Builder**: `Create(from, to, duration)` returns a `TweenBuilder<T>`. `WithEase`, `WithDelay`, `WithLoops`, `WithTimeMode`, `WithToken` and `WithCompletionCallback` return a modified copy, and `Bind(state, setter)` starts the tween with a static setter that captures nothing.
 - **Eases and loops**: 31 eases, `Restart` and `Yoyo` loops with an optional interval between them (any negative count loops forever), punch tweens that spring back to the start, and shake tweens that move through caller-provided points and back.
 - **Sequences**: `CreateSequence()` chains tweens with `Append`, `Join`, `AppendInterval` and `AppendCallback`, and cancels them together. A sequence stays active until its last tween, callback or interval ends. Its token cancels the whole sequence, and a tween's own token still cancels just that tween. Every tween in a sequence runs on the sequence's time mode, so a tween's own `WithTimeMode` is ignored there, and a negative delay counts as zero.

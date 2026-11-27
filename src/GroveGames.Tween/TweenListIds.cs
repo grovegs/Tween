@@ -2,7 +2,7 @@
 
 namespace GroveGames.Tween;
 
-internal static class TweenStorageIds
+internal static class TweenListIds
 {
     private static int s_last = -1;
 

@@ -5,7 +5,7 @@ using GroveGames.Scheduling;
 
 namespace GroveGames.Tween;
 
-internal sealed class TweenStorage<T, TAdapter> : ITweenValueStorage<T> where TAdapter : struct, ITweenAdapter<T>
+internal sealed class TweenList<T, TAdapter> : ITweenValueList<T> where TAdapter : struct, ITweenAdapter<T>
 {
     private readonly Tweener _tweener;
     private readonly SlotTable _slots;
@@ -13,7 +13,7 @@ internal sealed class TweenStorage<T, TAdapter> : ITweenValueStorage<T> where TA
     private TweenEntry<T>[] _entries;
     private int _count;
 
-    public TweenStorage(Tweener tweener, int id, int capacity)
+    public TweenList(Tweener tweener, int id, int capacity)
     {
         _tweener = tweener;
         _slots = new SlotTable(capacity);

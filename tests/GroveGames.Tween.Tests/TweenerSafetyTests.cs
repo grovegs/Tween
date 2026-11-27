@@ -166,7 +166,7 @@ public sealed class TweenerSafetyTests
     }
 
     [Fact]
-    public void Update_TweenCreatedInCompletionIntoALaterStorage_StartsNextFrame()
+    public void Update_TweenCreatedInCompletionIntoALaterList_StartsNextFrame()
     {
         var tweener = new Tweener(static exception => throw new InvalidOperationException("Unexpected tween exception", exception));
         var target = new TestTarget();

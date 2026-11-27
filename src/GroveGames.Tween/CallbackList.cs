@@ -4,13 +4,13 @@ using GroveGames.Scheduling;
 
 namespace GroveGames.Tween;
 
-internal sealed class CallbackStorage
+internal sealed class CallbackList
 {
     private readonly Tweener _tweener;
     private CallbackEntry[] _entries;
     private int _count;
 
-    public CallbackStorage(Tweener tweener, int capacity)
+    public CallbackList(Tweener tweener, int capacity)
     {
         _tweener = tweener;
         _entries = new CallbackEntry[capacity];

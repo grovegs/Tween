@@ -1,6 +1,6 @@
 ﻿namespace GroveGames.Tween;
 
-internal interface ITweenStorage
+internal interface ITweenList
 {
     public int Count { get; }
     public void Update(float[] deltaTimes, int count);
