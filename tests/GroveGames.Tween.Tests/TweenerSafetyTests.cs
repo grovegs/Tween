@@ -165,6 +165,21 @@ public sealed class TweenerSafetyTests
         Assert.Equal(0.5f, target.Value, Tolerance);
     }
 
+    [Fact]
+    public void Update_TweenCreatedInCompletionIntoALaterStorage_StartsNextFrame()
+    {
+        var tweener = new Tweener(static exception => throw new InvalidOperationException("Unexpected tween exception", exception));
+        var target = new TestTarget();
+        tweener.Create<float, FakeLinearAdapter>(0f, 1f, 10f).Bind(new TestTarget(), static (value, target) => target.SetValue(value));
+        tweener.Create(0f, 1f, 0.5f)
+            .WithCompletionCallback(() => tweener.Create<float, FakeLinearAdapter>(0f, 1f, 1f).Bind(target, static (value, target) => target.SetValue(value)))
+            .Bind(new TestTarget(), static (value, target) => target.SetValue(value));
+
+        Step(tweener, 0.5f);
+
+        Assert.Equal(0f, target.Value);
+    }
+
     private readonly struct FakeThrowingAdapter : ITweenAdapter<float>
     {
         public float Evaluate(in float from, in float to, float progress)

@@ -19,6 +19,7 @@ public sealed class Tweener : ITweener
     private readonly SlotTable _sequences;
     private ITweenStorage?[] _storagesById;
     private ITweenStorage[] _storages;
+    private int[] _storageCounts;
     private int _storageCount;
     private double[] _sequenceCursors;
     private double[] _sequenceLastStarts;
@@ -36,6 +37,7 @@ public sealed class Tweener : ITweener
         _deltaTimes = new float[TimeModeCount];
         _storagesById = new ITweenStorage?[StorageTypeCapacity];
         _storages = new ITweenStorage[StorageTypeCapacity];
+        _storageCounts = new int[StorageTypeCapacity];
         _storageCount = 0;
         _floats = GetStorage<float, FloatTweenAdapter>();
         _callbacks = new CallbackStorage(this, StorageCapacity);
@@ -125,7 +127,12 @@ public sealed class Tweener : ITweener
 
         for (var i = 0; i < storageCount; i++)
         {
-            _storages[i].Update(_deltaTimes);
+            _storageCounts[i] = _storages[i].Count;
+        }
+
+        for (var i = 0; i < storageCount; i++)
+        {
+            _storages[i].Update(_deltaTimes, _storageCounts[i]);
         }
 
         _callbacks.Update(_deltaTimes, callbackCount);
@@ -271,6 +278,7 @@ public sealed class Tweener : ITweener
         if (_storageCount == _storages.Length)
         {
             Array.Resize(ref _storages, _storageCount * 2);
+            Array.Resize(ref _storageCounts, _storageCount * 2);
         }
 
         var storage = new TweenStorage<T, TAdapter>(this, id, StorageCapacity);

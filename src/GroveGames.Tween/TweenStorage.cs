@@ -42,9 +42,10 @@ internal sealed class TweenStorage<T, TAdapter> : ITweenValueStorage<T> where TA
         return slot;
     }
 
-    public void Update(float[] deltaTimes)
+    public int Count => _count;
+
+    public void Update(float[] deltaTimes, int count)
     {
-        var count = _count;
         var write = 0;
 
         for (var read = 0; read < count; read++)

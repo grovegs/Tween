@@ -50,7 +50,7 @@ The core uses C# 10, so add a `csc.rsp` to `Assets/`:
 
 ## Usage
 
-Create a tweener with a handler for exceptions thrown by adapters, setters and callbacks, and update it once per frame. Each frame updates every tween, then every sequence callback, so a tween that starts when a callback runs gets its first value before that callback. A tween, sequence or callback created during an update starts on the next one. A finished tween ends exactly at its `to` value:
+Create a tweener with a handler for exceptions thrown by adapters, setters and callbacks, and update it once per frame. Each frame updates every tween, then every sequence callback, so a tween that starts when a callback runs gets its first value before that callback. A tween, sequence or callback created during an update starts on the next one. A finished tween ends exactly at its final value: `to`, or `from` after an even number of yoyo loops and for punch and shake tweens:
 
 ```csharp
 var tweener = new Tweener(Debug.LogException);
