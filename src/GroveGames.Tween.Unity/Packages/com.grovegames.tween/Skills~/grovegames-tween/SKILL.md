@@ -12,6 +12,8 @@ Rules for game code that animates with this package. They hold in every game. Th
 - Keep a delegate in a field only when the same instance is needed again, for example to unsubscribe. A method group passed as a delegate allocates on every call.
 - UI runs on unscaled time, because time can stop while a scene loads. A UI tween uses `.WithTimeMode(TimeMode.Unscaled)` and a UI sequence is created with `CreateSequence(TimeMode.Unscaled)`.
 - A UI timer is an unscaled tween sequence, not a frame update.
+- A tween inside a sequence runs on the sequence's time mode; set the mode on `CreateSequence`, not on the tween.
+- A sequence callback runs after the first value of a tween that starts at the same time. To reset a property before the next tween animates it, do it in the earlier tween's completion callback.
 - World-space effects that belong to the gameplay, such as damage labels, stay on scaled time.
 
 ## Unity
